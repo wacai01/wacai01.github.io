@@ -1,0 +1,2361 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>排更系統 · 香港餐飲集團</title>
+<style>
+:root{
+  --primary:#2C5F8A; --primary-dark:#1F4768; --bg:#F2F5F9; --card:#ffffff;
+  --text:#23272F; --muted:#6B7280; --border:#E2E8F0;
+  --yellow:#FFD966; --green:#9FE2A0; --blue:#7EC8F7; --purple:#B39DDB; --gray:#D9DEE5;
+  --danger:#E5533C; --success:#2F9E5F; --warn:#E8A33D;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+.hidden{display:none!important}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--primary)}
+.btn{border:none;border-radius:8px;padding:8px 16px;font-size:14px;font-weight:600;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-secondary{background:#E8EDF3;color:var(--text)}
+.btn-success{background:var(--success);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-warn{background:var(--warn);color:#fff}
+.btn-sm{padding:4px 10px;font-size:12px;border-radius:6px}
+.btn-link{background:none;border:none;color:var(--primary);text-decoration:underline;padding:0}
+/* 登入頁 */
+#view-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1F4768 0%,#2C5F8A 55%,#4A86B8 100%)}
+.login-wrap{width:min(960px,94vw);display:flex;gap:28px;align-items:stretch}
+.login-card{flex:1;background:rgba(255,255,255,.97);border-radius:16px;padding:34px 38px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.login-card h1{font-size:24px;color:var(--primary-dark);margin-bottom:4px}
+.login-card .sub{color:var(--muted);margin-bottom:22px}
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#444}
+.demo-list{flex:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);border-radius:16px;padding:30px 34px;color:#fff}
+.demo-list h2{font-size:19px;margin-bottom:16px}
+.demo-group{margin-bottom:18px}
+.demo-group .g-title{font-size:13px;font-weight:700;color:#FFE9A8;margin-bottom:8px}
+.demo-acc{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.14);border-radius:10px;padding:8px 14px;margin-bottom:6px;font-size:13px}
+.demo-acc small{color:#C9E0F2}
+.demo-acc .btn{background:rgba(255,255,255,.85);color:var(--primary-dark);padding:4px 12px;font-size:12px;border-radius:7px}
+.err-msg{color:var(--danger);font-size:13px;min-height:18px;margin-bottom:8px}
+/* 主框架 */
+#view-main{display:flex;flex-direction:column;min-height:100vh}
+header{background:var(--primary);color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.brand{font-size:18px;font-weight:800;letter-spacing:1px}
+.header-user{display:flex;align-items:center;gap:12px;font-size:13px}
+.header-user .role-tag{background:rgba(255,255,255,.22);padding:3px 10px;border-radius:20px;font-size:12px}
+nav{background:#fff;border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:4px;overflow-x:auto}
+nav button{background:none;border:none;padding:12px 16px;font-size:14px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap}
+nav button.active{color:var(--primary);border-bottom-color:var(--primary)}
+main{padding:22px 26px;max-width:1500px;width:100%;margin:0 auto;flex:1}
+.page-title{font-size:20px;font-weight:800;margin-bottom:4px}
+.page-sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.card+.card{margin-top:16px}
+.card-title{font-size:15px;font-weight:800;margin-bottom:12px;color:var(--primary-dark)}
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.toolbar .spacer{flex:1}
+/* 統計卡 */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:18px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center}
+.stat-card .num{font-size:30px;font-weight:900;color:var(--primary)}
+.stat-card .lbl{font-size:12px;color:var(--muted);margin-top:2px}
+/* 更表 */
+.roster-table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;font-size:13px}
+.roster-table th{background:var(--primary);color:#fff;padding:8px 6px;font-size:12px;min-width:86px}
+.roster-table th small{font-weight:400;opacity:.85}
+.roster-table td{border:1px solid var(--border);padding:6px;text-align:center;vertical-align:middle}
+.roster-table td.emp-col{background:#F7F9FC;font-weight:700;text-align:left;min-width:120px;position:sticky;left:0}
+.roster-table td.emp-col small{color:var(--muted);font-weight:400}
+.roster-table tr.me-row td.emp-col{background:#FFF3D6}
+.roster-table tr.me-row td:not(.emp-col){outline:2px solid #E8A33D;outline-offset:-2px}
+.roster-table .cell{cursor:pointer;min-height:56px}
+.roster-table .cell.editable:hover{outline:2px solid var(--primary);outline-offset:-2px}
+.roster-table .cell.drag-over{outline:3px dashed var(--success);outline-offset:-3px;background:#E9FBEF!important}
+.shift-name{font-weight:800;font-size:13px;display:block}
+.roster-table .tiny{font-size:10px;opacity:.85}
+.legend{display:flex;gap:14px;flex-wrap:wrap;padding:10px 0}
+.legend .item{display:flex;align-items:center;gap:6px;font-size:12px;color:#444}
+.legend .swatch{width:16px;height:16px;border-radius:5px;border:1px solid rgba(0,0,0,.12);display:inline-block}
+/* 排更編輯 */
+.shift-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.shift-chip{padding:10px 18px;border-radius:10px;font-weight:800;cursor:grab;user-select:none;box-shadow:0 1px 3px rgba(0,0,0,.15);font-size:13px}
+.shift-chip small{display:block;font-weight:400;font-size:11px;opacity:.85}
+.shift-chip.dragging{opacity:.5}
+.edit-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end}
+.edit-form .f-item label{display:block;font-size:12px;font-weight:700;color:#555;margin-bottom:4px}
+/* 請求 */
+.req-card{border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:#fff;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.req-card .r-info{flex:1;min-width:220px}
+.req-card .r-info b{font-size:14px}
+.req-card .r-info small{color:var(--muted)}
+.badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.badge-pending{background:#FDF0D7;color:#9A6B00}
+.badge-approved{background:#DCF5E6;color:#1E7A4A}
+.badge-rejected{background:#FDE3DE;color:#A83A28}
+.status-pill{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
+.status-pill.p0{background:#FDF0D7;color:#9A6B00}
+.status-pill.p1{background:#DCF5E6;color:#1E7A4A}
+.status-pill.p2{background:#FDE3DE;color:#A83A28}
+/* 儀表板 bar */
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
+.bar-row .b-label{width:46px;color:var(--muted);text-align:right}
+.bar-track{flex:1;background:#EEF2F7;border-radius:8px;height:20px;overflow:hidden}
+.bar-fill{height:100%;border-radius:8px;background:var(--primary);transition:width .3s}
+.bar-row .b-val{width:44px;font-weight:700}
+/* 月視圖 */
+.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.month-grid .m-head{text-align:center;font-weight:800;font-size:12px;color:var(--muted);padding:4px}
+.month-cell{background:#fff;border:1px solid var(--border);border-radius:10px;min-height:96px;padding:8px;cursor:pointer;position:relative;transition:box-shadow .15s}
+.month-cell:hover{box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.month-cell.other{opacity:.4}
+.month-cell .d-num{font-weight:800;font-size:13px}
+.month-cell.today{border-color:var(--primary);box-shadow:0 0 0 2px rgba(44,95,138,.25)}
+.month-cell .m-att{font-size:11px;color:var(--muted);margin-top:4px}
+.month-cell .m-shifts{margin-top:6px;display:flex;flex-direction:column;gap:3px}
+.m-shift-line{font-size:11px;border-radius:5px;padding:1px 6px;font-weight:600;color:#333}
+/* 模態框 */
+#modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal{background:#fff;border-radius:16px;width:min(520px,94vw);max-height:88vh;overflow:auto;padding:24px 26px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal h3{font-size:17px;margin-bottom:16px;color:var(--primary-dark)}
+.modal .form-row{margin-bottom:12px}
+.modal .m-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+/* 表格數據 */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:10px;overflow:hidden}
+.data-table th{background:#EDF1F7;padding:8px 10px;text-align:left;font-size:12px;color:#444}
+.data-table td{padding:8px 10px;border-top:1px solid var(--border)}
+/* 分店切換 */
+.branch-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.branch-tab{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:#fff;font-size:13px;font-weight:600;color:var(--muted)}
+.branch-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.footer-note{color:var(--muted);font-size:12px;margin-top:18px;text-align:center}
+.btn-danger{background:#d9534f;color:#fff}
+.btn-danger:hover{background:#c9302c}
+/* 日視圖 */
+.day-grid{position:relative;min-width:760px;overflow-x:auto}
+.day-ghead{display:flex;align-items:stretch;border-bottom:2px solid var(--border)}
+.day-emp-head{width:110px;flex:0 0 110px;font-size:12px;font-weight:700;padding:6px;color:#555;box-sizing:border-box}
+.day-timeline{position:relative;flex:1;display:flex;align-items:stretch}
+.day-h{flex:1;border-left:1px solid #e8ecf2;font-size:10px;color:var(--muted);padding:3px 0 0 3px;box-sizing:border-box;overflow:hidden}
+.day-row{display:flex;align-items:stretch}
+.day-emp{width:110px;flex:0 0 110px;display:flex;flex-direction:column;justify-content:center;font-size:12px;font-weight:600;padding:2px 6px;box-sizing:border-box}
+.day-emp small{font-weight:400;color:var(--muted);font-size:10px}
+.day-row .day-timeline{height:36px;border-bottom:1px solid #f0f2f6;background:repeating-linear-gradient(90deg,transparent,transparent calc(100%/24 - 1px),#eef1f5 calc(100%/24 - 1px),#eef1f5 calc(100%/24))}
+.day-bar{position:absolute;top:2px;bottom:2px;border-radius:6px;overflow:hidden;display:block;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.day-bar-label{position:absolute;left:6px;top:0;bottom:0;display:flex;align-items:center;font-size:11px;font-weight:600;color:#333;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 2px #fff}
+.day-break{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(45deg,#5b2c2c,#5b2c2c 3px,#7a3b3b 3px,#7a3b3b 6px);border-left:1px solid rgba(255,255,255,.6);border-right:1px solid rgba(255,255,255,.6);z-index:2}
+.day-break-swatch{width:16px;height:16px;border-radius:4px;background:repeating-linear-gradient(45deg,#5b2c2c,#5b2c2c 3px,#7a3b3b 3px,#7a3b3b 6px)}
+.day-note{color:#d33;font-size:12px;padding:8px 10px}
+@media(max-width:860px){ .login-wrap{flex-direction:column} .roster-table td.emp-col{position:static} }
+
+/* 日視圖：高亮自己的班次 */
+.day-row.me-day-row .day-emp{background:#FFF3D6}
+.day-row.me-day-row .day-timeline{outline:2px solid #E8A33D;outline-offset:-2px}
+
+/* ===== 本輪新增：配額 / 空缺認投 / 偏好 ===== */
+.quota-table td{font-size:12px;vertical-align:top;text-align:center}
+.quota-miss{background:#FDF0D7;color:#9A6B00}
+.quota-ok{background:#F2FAF5;color:#2a6}
+.quota-table .tiny{font-size:10px;color:#d33;font-weight:700}
+.pref-table th{font-size:12px}
+.pref-table th small{font-weight:400;font-size:10px;color:var(--muted)}
+.pref-table td{text-align:center}
+.pref-table input[type="checkbox"]{width:16px;height:16px;cursor:pointer}
+.btn-sm{padding:5px 12px;font-size:12px}
+
+
+/* ===== 本輪新增：配額 / 空缺認投 / 偏好 ===== */
+.quota-table td{font-size:12px;vertical-align:top;text-align:center}
+.quota-miss{background:#FDF0D7;color:#9A6B00}
+.quota-ok{background:#F2FAF5;color:#2a6}
+.quota-table .tiny{font-size:10px;color:#d33;font-weight:700}
+.pref-table th{font-size:12px}
+.pref-table th small{font-weight:400;font-size:10px;color:var(--muted)}
+.pref-table td{text-align:center}
+.pref-table input[type="checkbox"]{width:16px;height:16px;cursor:pointer}
+.btn-sm{padding:5px 12px;font-size:12px}
+
+
+/* === v3 擴充樣式 === */
+.pt-row td{ background:#FFF3E0; }
+.ft-row td{ background:#E8F1FF; }
+.me-row td{ background:#FFF9C4 !important; }
+.emp-tag{ font-weight:700; }
+.over-tag{ display:inline-block; color:#fff; background:#d33; border-radius:6px; padding:1px 6px; font-size:10px; font-weight:700; margin-top:2px; }
+.full-tag{ display:inline-block; color:#fff; background:#d33; border-radius:8px; padding:4px 10px; font-size:12px; font-weight:700; }
+.holiday-chip{ display:inline-flex; align-items:center; background:#FFF0F5; border:1px solid #F2A0B4; border-radius:8px; padding:4px 8px; font-size:12px; }
+.chip{ display:inline-flex; align-items:center; gap:4px; background:var(--card); border:1px solid var(--border); border-radius:999px; padding:4px 10px; font-size:12px; cursor:pointer; }
+.quota-na{ color:var(--muted); background:#F1F3F5; text-align:center; font-size:11px; padding:6px 10px; border-radius:8px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ===================== 登入頁 ===================== -->
+<div id="view-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <h1>排更系統</h1>
+      <div class="sub">香港餐飲集團 · 員工更表管理平台</div>
+      <div class="err-msg" id="login-err"></div>
+      <div class="form-row">
+        <label>角色</label>
+        <select id="login-role" style="width:100%">
+          <option value="boss">老闆（公司總覽）</option>
+          <option value="manager">分店經理</option>
+          <option value="employee">分店員工</option>
+        </select>
+      </div>
+      <div class="form-row" id="login-branch-row">
+        <label>分店</label>
+        <select id="login-branch" style="width:100%"></select>
+      </div>
+      <div class="form-row">
+        <label>用戶名稱</label>
+        <input id="login-user" placeholder="輸入用戶名稱" style="width:100%">
+      </div>
+      <div class="form-row">
+        <label>密碼</label>
+        <input id="login-pass" type="password" placeholder="輸入密碼" style="width:100%">
+      </div>
+      <button class="btn btn-primary" style="width:100%;padding:11px" onclick="doLogin()">登入</button>
+      <div style="margin-top:14px;font-size:12px;color:var(--muted)">提示：可直接使用右方示範帳號一鍵登入體驗各角色。</div>
+    </div>
+    <div class="demo-list" id="demo-list"></div>
+  </div>
+</div>
+
+<!-- ===================== 主界面 ===================== -->
+<div id="view-main" class="hidden">
+  <header>
+    <div class="brand">📋 排更系統</div>
+    <div class="header-user">
+      <span id="hdr-user"></span>
+      <span class="role-tag" id="hdr-role"></span>
+      <button class="btn btn-secondary btn-sm" onclick="logout()">登出</button>
+    </div>
+  </header>
+  <nav id="navbar"></nav>
+  <main id="content"></main>
+</div>
+
+<!-- ===================== 模態框 ===================== -->
+<div id="modal-backdrop" class="hidden">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+</div>
+
+<script>
+/* ================================================================
+   排更系統 · 單檔 HTML 應用（localStorage 持久化，無後端）
+   ================================================================ */
+const DB_KEY = 'hk_roster_v1';
+let db = { company:{}, branches:[], users:[], shifts:[], schedules:[], requests:[], locations:[] };
+const state = { userId:null, weekStart:new Date(), monthY:2026, monthM:9, bossBranchId:null, dragShiftId:null, dayDate:null };
+
+/* ---------------- 工具函數 ---------------- */
+function pad(n){ return String(n).padStart(2,'0'); }
+function toDateStr(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function parseDate(s){ const p=s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function getMonday(d){ const x=new Date(d); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return x; }
+function genId(){ return 'id_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+const WEEKDAYS=['星期一','星期二','星期三','星期四','星期五','星期六','星期日'];
+function weekdayName(d){ return WEEKDAYS[(d.getDay()+6)%7]; }
+function fmtMD(d){ return (d.getMonth()+1)+'/'+d.getDate(); }
+function fmtFull(d){ return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate(); }
+function todayStr(){ return toDateStr(new Date()); }
+function hoursBetween(start,end,crossDay,breakStr){
+  const [sh,sm]=start.split(':').map(Number); let [eh,em]=end.split(':').map(Number);
+  if(crossDay) eh+=24;
+  let mins=(eh*60+em)-(sh*60+sm);
+  if(breakStr && breakStr.includes('-')){
+    const b=breakStr.split('-');
+    const [bh,bm]=b[0].split(':').map(Number); const [bh2,bm2]=b[1].split(':').map(Number);
+    mins-=((bh2*60+bm2)-(bh*60+bm));
+  }
+  return Math.max(0, Math.round(mins/60*10)/10);
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------------- 示範資料 ---------------- */
+function seedDB(){
+  const now=new Date();
+  db.company = { name:'香港餐飲集團', createdAt: now.toISOString() };
+  db.branches = [
+    { id:'b1', name:'中環分店', address:'中環德輔道中 88 號' },
+    { id:'b2', name:'旺角分店', address:'旺角彌敦道 600 號' }
+  ];
+  db.locations = [
+    { id:'l1', branchId:'b1', name:'中環店' }, { id:'l2', branchId:'b1', name:'上環店' },
+    { id:'l3', branchId:'b2', name:'旺角店' }, { id:'l4', branchId:'b2', name:'油麻地店' }
+  ];
+  db.positions = [
+    { id:'p1', name:'收銀' }, { id:'p2', name:'樓面' }, { id:'p3', name:'廚房' },
+    { id:'p4', name:'水吧' }, { id:'p5', name:'傳菜' }
+  ];
+  db.users = [
+    { id:'u_boss', name:'陳大文', role:'boss', branchId:null, username:'boss', password:'boss123', defaultPosition:'—', empType:'fulltime' },
+    { id:'u_m1', name:'李志明', role:'manager', branchId:'b1', username:'m1', password:'123456', defaultPosition:'經理', empType:'fulltime' },
+    { id:'u_m2', name:'王美玲', role:'manager', branchId:'b2', username:'m2', password:'123456', defaultPosition:'經理', empType:'fulltime' },
+    { id:'u_s1', name:'張小明', role:'employee', branchId:'b1', username:'s1', password:'123456', defaultPosition:'收銀', empType:'fulltime' },
+    { id:'u_s2', name:'陳小美', role:'employee', branchId:'b1', username:'s2', password:'123456', defaultPosition:'樓面', empType:'parttime', prefs:[{d:1,shiftId:'s_early'},{d:2,shiftId:'s_late'},{d:4,shiftId:'s_late'},{d:5,shiftId:'s_mid'}] },
+    { id:'u_s3', name:'黃志強', role:'employee', branchId:'b1', username:'s3', password:'123456', defaultPosition:'廚房', empType:'fulltime' },
+    { id:'u_s4', name:'林曉雯', role:'employee', branchId:'b1', username:'s4', password:'123456', defaultPosition:'水吧', empType:'fulltime' },
+    { id:'u_s5', name:'何俊傑', role:'employee', branchId:'b1', username:'s5', password:'123456', defaultPosition:'傳菜', empType:'parttime', prefs:[{d:2,shiftId:'s_early'},{d:3,shiftId:'s_mid'},{d:5,shiftId:'s_late'},{d:6,shiftId:'s_early'}] },
+    { id:'u_s6', name:'劉嘉欣', role:'employee', branchId:'b2', username:'s6', password:'123456', defaultPosition:'收銀', empType:'fulltime' },
+    { id:'u_s7', name:'吳家豪', role:'employee', branchId:'b2', username:'s7', password:'123456', defaultPosition:'樓面', empType:'parttime', prefs:[{d:3,shiftId:'s_late'},{d:4,shiftId:'s_early'},{d:6,shiftId:'s_mid'},{d:7,shiftId:'s_late'}] },
+    { id:'u_s8', name:'鄭秀文', role:'employee', branchId:'b2', username:'s8', password:'123456', defaultPosition:'廚房', empType:'fulltime' },
+    { id:'u_s9', name:'鄧紫琪', role:'employee', branchId:'b2', username:'s9', password:'123456', defaultPosition:'水吧', empType:'fulltime' },
+    { id:'u_s10', name:'麥俊朗', role:'employee', branchId:'b2', username:'s10', password:'123456', defaultPosition:'傳菜', empType:'parttime', prefs:[{d:1,shiftId:'s_early'},{d:3,shiftId:'s_mid'},{d:4,shiftId:'s_late'},{d:6,shiftId:'s_late'}] },
+    { id:'u_s11', name:'周芷若', role:'employee', branchId:'b1', username:'s11', password:'123456', defaultPosition:'樓面', empType:'parttime', prefs:[{d:1,shiftId:'s_early'},{d:2,shiftId:'s_early'},{d:3,shiftId:'s_late'},{d:5,shiftId:'s_late'}] },
+    { id:'u_s12', name:'孫悟空', role:'employee', branchId:'b1', username:'s12', password:'123456', defaultPosition:'廚房', empType:'parttime', prefs:[{d:2,shiftId:'s_late'},{d:4,shiftId:'s_mid'},{d:5,shiftId:'s_early'},{d:6,shiftId:'s_late'}] },
+    { id:'u_s13', name:'楊過', role:'employee', branchId:'b1', username:'s13', password:'123456', defaultPosition:'傳菜', empType:'parttime', prefs:[{d:3,shiftId:'s_early'},{d:4,shiftId:'s_late'},{d:6,shiftId:'s_mid'},{d:7,shiftId:'s_mid'}] },
+    { id:'u_s14', name:'小龍女', role:'employee', branchId:'b1', username:'s14', password:'123456', defaultPosition:'水吧', empType:'parttime', prefs:[{d:1,shiftId:'s_early'},{d:3,shiftId:'s_mid'},{d:5,shiftId:'s_late'},{d:6,shiftId:'s_early'}] },
+    { id:'u_s15', name:'令狐沖', role:'employee', branchId:'b2', username:'s15', password:'123456', defaultPosition:'樓面', empType:'parttime', prefs:[{d:2,shiftId:'s_late'},{d:3,shiftId:'s_early'},{d:5,shiftId:'s_mid'},{d:7,shiftId:'s_early'}] },
+    { id:'u_s16', name:'東方不敗', role:'employee', branchId:'b2', username:'s16', password:'123456', defaultPosition:'收銀', empType:'parttime', prefs:[{d:1,shiftId:'s_early'},{d:4,shiftId:'s_early'},{d:5,shiftId:'s_late'},{d:6,shiftId:'s_late'}] },
+    { id:'u_s17', name:'郭靖', role:'employee', branchId:'b2', username:'s17', password:'123456', defaultPosition:'傳菜', empType:'parttime', prefs:[{d:2,shiftId:'s_early'},{d:4,shiftId:'s_mid'},{d:6,shiftId:'s_late'},{d:7,shiftId:'s_early'}] },
+    { id:'u_s18', name:'黃蓉', role:'employee', branchId:'b2', username:'s18', password:'123456', defaultPosition:'水吧', empType:'parttime', prefs:[{d:3,shiftId:'s_late'},{d:5,shiftId:'s_early'},{d:6,shiftId:'s_mid'},{d:7,shiftId:'s_late'}] },
+    { id:'u_s19', name:'張無忌', role:'employee', branchId:'b1', username:'s19', password:'123456', defaultPosition:'廚房', empType:'fulltime' },
+    { id:'u_s20', name:'趙敏', role:'employee', branchId:'b2', username:'s20', password:'123456', defaultPosition:'樓面', empType:'fulltime' },
+    { id:'u_s21', name:'阿紫', role:'employee', branchId:'b1', username:'s21', password:'123456', defaultPosition:'收銀', empType:'parttime', prefs:[{d:1,shiftId:'s_late'},{d:2,shiftId:'s_mid'},{d:4,shiftId:'s_early'},{d:7,shiftId:'s_early'}] },
+    { id:'u_s22', name:'虛竹', role:'employee', branchId:'b2', username:'s22', password:'123456', defaultPosition:'廚房', empType:'parttime', prefs:[{d:2,shiftId:'s_early'},{d:4,shiftId:'s_late'},{d:5,shiftId:'s_mid'},{d:7,shiftId:'s_late'}] }
+  ];
+  db.shifts = [
+    { id:'s_early', name:'早班', code:'早', start:'09:00', end:'18:00', crossDay:false, break:'12:00-13:00', color:'#FFD966', isRest:false, quotaFull:2, quotaPart:1, days:[1,2,3,4,5] },
+    { id:'s_mid',   name:'午班', code:'午', start:'11:00', end:'20:00', crossDay:false, break:'13:30-14:30', color:'#A9D18E', isRest:false, quotaFull:2, quotaPart:1, days:[1,2,3,4,5,6,7,0] },
+    { id:'s_late',  name:'晚班', code:'晚', start:'12:30', end:'21:30', crossDay:false, break:'15:30-16:30', color:'#7EC8F7', isRest:false, quotaFull:2, quotaPart:1, days:[1,2,3,4,5,6,7,0] },
+    { id:'s_night', name:'夜班', code:'夜', start:'22:00', end:'06:00', crossDay:true,  break:'02:00-03:00', color:'#B39DDB', isRest:false, quotaFull:1, quotaPart:1, days:[1,2,3,4,5,6,7,0] },
+    { id:'s_ph_early', name:'公假早班', code:'假', start:'09:00', end:'18:00', crossDay:false, break:'12:00-13:00', color:'#F2A0B4', isRest:false, quotaFull:1, quotaPart:1, days:[0] },
+    { id:'s_rest',  name:'休息', code:'休', start:'', end:'', crossDay:false, break:'', color:'#D9DEE5', isRest:true, quotaFull:0, quotaPart:0 }
+  ];
+  db.schedules = [];
+  db.requests = [];
+  db.claims = [];
+  db.quotaCleanup = [];
+  db.holidays = ['2026-10-01','2026-10-02','2026-12-25','2027-01-01'];
+  db.quotaCleanupCount = 0;
+  genWeekSchedule();
+  seedRequests();
+  seedClaims();
+  enforceQuota();
+}
+
+function genWeekSchedule(){
+  const weekStart=getMonday(new Date());
+  for(let bi=0;bi<db.branches.length;bi++){
+    const b=db.branches[bi];
+    const emps=db.users.filter(u=>u.role==='employee' && u.branchId===b.id);
+    const locs=db.locations.filter(l=>l.branchId===b.id);
+    for(let ei=0;ei<emps.length;ei++){
+      const emp=emps[ei];
+      const days = emp.empType==='parttime' ? [0,1,2] : [0,1,2,3,4];
+      for(let di=0;di<days.length;di++){
+        const ds=toDateStr(addDays(weekStart,days[di]));
+        autoAssignShift(emp, ds, locs, emp.defaultPosition||'');
+      }
+    }
+  }
+}
+
+function seedRequests(){
+  const base = toDateStr(getMonday(new Date()));
+  const d=(n)=>toDateStr(addDays(parseDate(base),n));
+  db.requests.push({ id:genId(), employeeId:'u_s1', branchId:'b1', type:'病假', dateFrom:d(3), dateTo:d(3), note:'發燒不適，需休息一天', status:'pending', createdAt:new Date().toISOString() });
+  db.requests.push({ id:genId(), employeeId:'u_s3', branchId:'b1', type:'事假', dateFrom:d(5), dateTo:d(6), note:'家中要事，請假兩天', status:'pending', createdAt:new Date().toISOString() });
+  db.requests.push({ id:genId(), employeeId:'u_s4', branchId:'b1', type:'年假', dateFrom:d(7), dateTo:d(9), note:'年度旅行計劃', status:'pending', createdAt:new Date().toISOString() });
+  db.requests.push({ id:genId(), employeeId:'u_s7', branchId:'b2', type:'事假', dateFrom:d(4), dateTo:d(4), note:'親友婚禮', status:'pending', createdAt:new Date().toISOString() });
+  db.requests.push({ id:genId(), employeeId:'u_s8', branchId:'b2', type:'年假', dateFrom:d(1), dateTo:d(1), note:'處理私人事務', status:'approved', createdAt:new Date().toISOString() });
+  db.requests.push({ id:genId(), employeeId:'u_s6', branchId:'b2', type:'病假', dateFrom:d(2), dateTo:d(2), note:'腸胃炎需休息', status:'pending', createdAt:new Date().toISOString() });
+}
+
+/* ---------------- 資料持久化 ---------------- */
+function loadDB(){
+  try{ const raw=localStorage.getItem(DB_KEY); if(raw){ db=JSON.parse(raw); migrateDB(); saveDB(); return; } }catch(e){}
+  seedDB(); migrateDB(); saveDB();
+}
+function migrateDB(){
+  if(!Array.isArray(db.positions) || !db.positions.length){
+    db.positions = [
+      { id:'p1', name:'收銀' }, { id:'p2', name:'樓面' }, { id:'p3', name:'廚房' },
+      { id:'p4', name:'水吧' }, { id:'p5', name:'傳菜' }
+    ];
+  }
+  db.shifts.forEach(s=>{ if(!s.color) s.color='#CCCCCC'; });
+  db.users.forEach(u=>{ if(!u.empType) u.empType='fulltime'; if(u.defaultPosition==null) u.defaultPosition=''; });
+  db.requests.forEach(r=>{
+    if(!Array.isArray(r.history)) r.history=[];
+    if(r.processedAt==null) r.processedAt=null;
+    if(!r.processedBy) r.processedBy='';
+    if(!r.rejectReason) r.rejectReason='';
+  });
+  /* ===== v2 遷移：配額 / 偏好 / 認投 ===== */
+  if(!Array.isArray(db.claims)) db.claims=[];
+  db.shifts.forEach(s=>{
+    if(s.quotaFull==null) s.quotaFull = s.isRest ? 0 : (s.id==='s_early' ? 3 : (s.id==='s_mid' ? 2 : (s.id==='s_late' ? 2 : 1)));
+    if(s.quotaPart==null) s.quotaPart = s.isRest ? 0 : 1;
+  });
+  db.users.forEach(u=>{ if(!Array.isArray(u.prefs)) u.prefs=[]; });
+  const prefSeeds={
+    'u_s2':[{d:1,shiftId:'s_early'},{d:2,shiftId:'s_late'},{d:4,shiftId:'s_late'},{d:5,shiftId:'s_mid'}],
+    'u_s5':[{d:2,shiftId:'s_early'},{d:3,shiftId:'s_mid'},{d:5,shiftId:'s_late'},{d:6,shiftId:'s_early'}],
+    'u_s7':[{d:3,shiftId:'s_late'},{d:4,shiftId:'s_early'},{d:6,shiftId:'s_mid'},{d:7,shiftId:'s_late'}],
+    'u_s10':[{d:1,shiftId:'s_early'},{d:3,shiftId:'s_mid'},{d:4,shiftId:'s_late'},{d:6,shiftId:'s_late'}]
+  };
+  Object.keys(prefSeeds).forEach(id=>{
+    const u=db.users.find(x=>x.id===id);
+    if(u && u.empType==='parttime' && (!u.prefs || !u.prefs.length)) u.prefs=prefSeeds[id];
+  });
+  const newStaffs=[
+    { id:'u_s11', name:'周芷若', role:'employee', branchId:'b1', username:'s11', password:'123456', defaultPosition:'樓面', empType:'parttime', prefs:[{d:1,shiftId:'s_early'},{d:2,shiftId:'s_early'},{d:3,shiftId:'s_late'},{d:5,shiftId:'s_late'}] },
+    { id:'u_s12', name:'孫悟空', role:'employee', branchId:'b1', username:'s12', password:'123456', defaultPosition:'廚房', empType:'parttime', prefs:[{d:2,shiftId:'s_late'},{d:4,shiftId:'s_mid'},{d:5,shiftId:'s_early'},{d:6,shiftId:'s_late'}] },
+    { id:'u_s13', name:'楊過', role:'employee', branchId:'b1', username:'s13', password:'123456', defaultPosition:'傳菜', empType:'parttime', prefs:[{d:3,shiftId:'s_early'},{d:4,shiftId:'s_late'},{d:6,shiftId:'s_mid'},{d:7,shiftId:'s_mid'}] },
+    { id:'u_s14', name:'小龍女', role:'employee', branchId:'b1', username:'s14', password:'123456', defaultPosition:'水吧', empType:'parttime', prefs:[{d:1,shiftId:'s_early'},{d:3,shiftId:'s_mid'},{d:5,shiftId:'s_late'},{d:6,shiftId:'s_early'}] },
+    { id:'u_s15', name:'令狐沖', role:'employee', branchId:'b2', username:'s15', password:'123456', defaultPosition:'樓面', empType:'parttime', prefs:[{d:2,shiftId:'s_late'},{d:3,shiftId:'s_early'},{d:5,shiftId:'s_mid'},{d:7,shiftId:'s_early'}] },
+    { id:'u_s16', name:'東方不敗', role:'employee', branchId:'b2', username:'s16', password:'123456', defaultPosition:'收銀', empType:'parttime', prefs:[{d:1,shiftId:'s_early'},{d:4,shiftId:'s_early'},{d:5,shiftId:'s_late'},{d:6,shiftId:'s_late'}] },
+    { id:'u_s17', name:'郭靖', role:'employee', branchId:'b2', username:'s17', password:'123456', defaultPosition:'傳菜', empType:'parttime', prefs:[{d:2,shiftId:'s_early'},{d:4,shiftId:'s_mid'},{d:6,shiftId:'s_late'},{d:7,shiftId:'s_early'}] },
+    { id:'u_s18', name:'黃蓉', role:'employee', branchId:'b2', username:'s18', password:'123456', defaultPosition:'水吧', empType:'parttime', prefs:[{d:3,shiftId:'s_late'},{d:5,shiftId:'s_early'},{d:6,shiftId:'s_mid'},{d:7,shiftId:'s_late'}] },
+    { id:'u_s19', name:'張無忌', role:'employee', branchId:'b1', username:'s19', password:'123456', defaultPosition:'廚房', empType:'fulltime' },
+    { id:'u_s20', name:'趙敏', role:'employee', branchId:'b2', username:'s20', password:'123456', defaultPosition:'樓面', empType:'fulltime' },
+    { id:'u_s21', name:'阿紫', role:'employee', branchId:'b1', username:'s21', password:'123456', defaultPosition:'收銀', empType:'parttime', prefs:[{d:1,shiftId:'s_late'},{d:2,shiftId:'s_mid'},{d:4,shiftId:'s_early'},{d:7,shiftId:'s_early'}] },
+    { id:'u_s22', name:'虛竹', role:'employee', branchId:'b2', username:'s22', password:'123456', defaultPosition:'廚房', empType:'parttime', prefs:[{d:2,shiftId:'s_early'},{d:4,shiftId:'s_late'},{d:5,shiftId:'s_mid'},{d:7,shiftId:'s_late'}] }
+  ];
+  newStaffs.forEach(ns=>{
+    if(!db.users.some(x=>x.id===ns.id)){
+      db.users.push(ns);
+      ensureWeekScheduleFor(ns.id);
+    }
+  });
+  if(!Array.isArray(db.quotaCleanup)) db.quotaCleanup=[];
+  if(db.quotaCleanupCount==null) db.quotaCleanupCount=0;
+
+  /* v3 擴充：適用星期 / 公眾假期 / 全職工時日數上限 / 示範班次時間 */
+  if(!Array.isArray(db.holidays)) db.holidays=[];
+  ['2026-10-01','2026-10-02','2026-12-25','2027-01-01'].forEach(function(ds){ if(db.holidays.indexOf(ds)<0) db.holidays.push(ds); });
+  var v3Times={ s_early:{start:'09:00',end:'18:00',break:'12:00-13:00'}, s_mid:{start:'11:00',end:'20:00',break:'13:30-14:30'}, s_late:{start:'12:30',end:'21:30',break:'15:30-16:30'} };
+  db.shifts.forEach(function(s){
+    if(v3Times[s.id]){ s.start=v3Times[s.id].start; s.end=v3Times[s.id].end; s.break=v3Times[s.id].break; }
+    if(s.id==='s_night'){ s.break='02:00-03:00'; }
+    if(s.id==='s_early') s.days=[1,2,3,4,5];
+    if(s.id==='s_mid'||s.id==='s_late'||s.id==='s_night') s.days=[1,2,3,4,5,6,7,0];
+    if(!Array.isArray(s.days) && !s.isRest) s.days=[1,2,3,4,5,6,7,0];
+  });
+  if(!db.shifts.some(function(s){return s.id==='s_ph_early';})){
+    db.shifts.push({ id:'s_ph_early', name:'公假早班', code:'假', start:'09:00', end:'18:00', crossDay:false, break:'12:00-13:00', color:'#F2A0B4', isRest:false, quotaFull:1, quotaPart:1, days:[0] });
+  }
+  db.users.forEach(function(u){
+    if(u.ftHoursMax==null) u.ftHoursMax=40;
+    if(u.ftDaysMax==null) u.ftDaysMax=5;
+  });
+  enforceQuota();
+}
+
+function saveDB(){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+function resetDemo(){
+  if(confirm('確定要重設所有示範資料嗎？目前資料將被清除。')){
+    localStorage.removeItem(DB_KEY); seedDB(); saveDB(); location.reload();
+  }
+}
+function currentUser(){ return db.users.find(u=>u.id===state.userId)||null; }
+function currentBranch(){ const u=currentUser(); if(!u) return null; return db.branches.find(b=>b.id===u.branchId)||null; }
+function userBranchId(){ const u=currentUser(); return u.role==='boss' ? (state.bossBranchId||db.branches[0].id) : u.branchId; }
+function shiftById(id){ return db.shifts.find(s=>s.id===id)||null; }
+function userById(id){ return db.users.find(u=>u.id===id)||null; }
+function branchById(id){ return db.branches.find(b=>b.id===id)||null; }
+function locOptions(branchId){ return db.locations.filter(l=>l.branchId===branchId).map(l=>l.name); }
+function employeesOf(branchId){ return db.users.filter(u=>u.role==='employee' && u.branchId===branchId); }
+function schMap(branchId){
+  const m={};
+  db.schedules.forEach(s=>{ if(s.branchId===branchId) m[s.employeeId+'|'+s.date]=s; });
+  return m;
+}
+function isWorking(sch){ if(!sch) return false; const st=shiftById(sch.shiftId); return st && !st.isRest; }
+function leaveOn(employeeId, date){
+  return db.requests.find(r=>r.employeeId===employeeId && r.status==='approved' && r.dateFrom<=date && date<=r.dateTo)||null;
+}
+function attendanceOf(branchId,date){
+  const emps=employeesOf(branchId);
+  const m=schMap(branchId);
+  return emps.filter(e=>isWorking(m[e.id+'|'+date]) && !leaveOn(e.id,date)).length;
+}
+
+/* ---------------- 登入 ---------------- */
+function fillLoginBranch(){
+  const sel=document.getElementById('login-branch');
+  sel.innerHTML='';
+  db.branches.forEach(b=>{ const o=document.createElement('option'); o.value=b.id; o.textContent=b.name; sel.appendChild(o); });
+  document.getElementById('login-branch-row').style.display = document.getElementById('login-role').value==='boss' ? 'none':'block';
+}
+function doLogin(){
+  const role=document.getElementById('login-role').value;
+  const branchId=document.getElementById('login-branch').value;
+  const user=document.getElementById('login-user').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const u=db.users.find(x=>x.username===user && x.password===pass && x.role===role);
+  if(!u){ document.getElementById('login-err').textContent='用戶名稱或密碼錯誤，請重試。'; return; }
+  if(role!=='boss' && u.branchId!==branchId){ document.getElementById('login-err').textContent='該帳號不屬於所選分店。'; return; }
+  loginAs(u.id);
+}
+function loginAs(uid){
+  const u=userById(uid); if(!u) return;
+  state.userId=uid;
+  state.weekStart=getMonday(new Date());
+  const d=new Date(); state.monthY=d.getFullYear(); state.monthM=d.getMonth();
+  state.bossBranchId = u.role==='boss' ? db.branches[0].id : u.branchId;
+  renderHeader();
+  gotoHome();
+}
+function logout(){ state.userId=null; showLogin(); }
+function gotoHome(){
+  const u=currentUser();
+  if(u.role==='boss') go('dashboard');
+  else if(u.role==='manager') go('schedule');
+  else go('eschedule');
+}
+function showLogin(){
+  document.getElementById('view-login').classList.remove('hidden');
+  document.getElementById('view-main').classList.add('hidden');
+  fillLoginBranch(); renderDemoList();
+  document.getElementById('login-err').textContent='';
+}
+function renderDemoList(){
+  const el=document.getElementById('demo-list');
+  const groups=[
+    { t:'老闆', users:['u_boss'] },
+    { t:'分店經理', users:['u_m1','u_m2'] },
+    { t:'中環分店員工', users:['u_s1','u_s2','u_s3','u_s4','u_s5'] },
+    { t:'中環分店兼職（新）', users:['u_s11','u_s12','u_s13','u_s14','u_s21'] },
+    { t:'旺角分店員工', users:['u_s6','u_s7','u_s8','u_s9','u_s10'] },
+    { t:'旺角分店兼職（新）', users:['u_s15','u_s16','u_s17','u_s18','u_s22'] },
+    { t:'新增全職示範', users:['u_s19','u_s20'] }
+  ];
+  let h='<h2>示範帳號（一鍵登入）</h2>';
+  groups.forEach(g=>{
+    h+='<div class="demo-group"><div class="g-title">'+g.t+'</div>';
+    g.users.forEach(uid=>{
+      const u=userById(uid);
+      h+='<div class="demo-acc"><span>'+esc(u.name)+' <small>('+esc(u.username)+')</small></span><button class="btn" onclick="loginAs(\''+uid+'\')">登入</button></div>';
+    });
+    h+='</div>';
+  });
+  el.innerHTML=h;
+}
+
+/* ---------------- 主界面 ---------------- */
+function renderHeader(){
+  const u=currentUser(); if(!u) return;
+  document.getElementById('hdr-user').textContent=u.name;
+  const roleName={boss:'老闆',manager:'分店經理',employee:'分店員工'}[u.role];
+  const bObj = u.role==='boss' ? null : branchById(u.branchId);
+  const branchName = u.role==='boss' ? '全公司' : (bObj ? bObj.name : '');
+  document.getElementById('hdr-role').textContent=roleName+' · '+branchName;
+}
+function navItems(){
+  const u=currentUser(); if(!u) return [];
+  if(u.role==='boss') return [
+    {k:'dashboard', label:'📊 總覽儀表板'},
+    {k:'schedule', label:'🗓 分店更表'},
+    {k:'month', label:'📅 月視圖'},
+    {k:'day', label:'📆 日視圖'},
+    {k:'requests', label:'📨 公司請求'},
+    {k:'shifts', label:'⏱ 班次設定'},
+    {k:'staff', label:'👥 員工管理'},
+    {k:'prefs', label:'🕐 兼職偏好'},
+    {k:'positions', label:'🧩 崗位管理'}
+  ];
+  if(u.role==='manager') return [
+    {k:'schedule', label:'🗓 週更表'},
+    {k:'month', label:'📅 月視圖'},
+    {k:'day', label:'📆 日視圖'},
+    {k:'requests', label:'📨 請求覆核'},
+    {k:'stats', label:'📈 分店數據'},
+    {k:'shifts', label:'⏱ 班次設定'},
+    {k:'staff', label:'👥 員工管理'},
+    {k:'prefs', label:'🕐 兼職偏好'},
+    {k:'positions', label:'🧩 崗位管理'},
+    {k:'reset', label:'🔄 重設示範'}
+  ];
+  return [
+    {k:'eschedule', label:'🗓 我的更表'},
+    {k:'day', label:'📆 日視圖'},
+    {k:'vacancy', label:'📋 空缺認投'},
+    {k:'myprefs', label:'🕐 我的偏好'},
+    {k:'request', label:'📝 提交請求'},
+    {k:'myrequests', label:'📬 我的請求'}
+  ];
+}
+
+function renderNav(active){
+  const nav=document.getElementById('navbar');
+  nav.innerHTML='';
+  navItems().forEach(it=>{
+    const b=document.createElement('button');
+    b.textContent=it.label;
+    if(it.k===active) b.classList.add('active');
+    b.onclick=()=>go(it.k);
+    nav.appendChild(b);
+  });
+}
+function go(view){
+  const u=currentUser(); if(!u){ showLogin(); return; }
+  document.getElementById('view-login').classList.add('hidden');
+  document.getElementById('view-main').classList.remove('hidden');
+  renderNav(view);
+  const c=document.getElementById('content');
+  if(view==='dashboard') c.innerHTML=renderDashboard();
+  else if(view==='schedule') c.innerHTML=renderScheduleView();
+  else if(view==='month') c.innerHTML=renderMonthViewPage();
+  else if(view==='requests') c.innerHTML=renderRequestsView();
+  else if(view==='stats') c.innerHTML=renderStatsView();
+  else if(view==='shifts') c.innerHTML=renderShiftsView();
+  else if(view==='staff') c.innerHTML=renderStaffView();
+  else if(view==='day') c.innerHTML=renderDayView();
+  else if(view==='positions') c.innerHTML=renderPositionsView();
+  else if(view==='accounts') c.innerHTML=renderAccountsView();
+  else if(view==='eschedule') c.innerHTML=renderEScheduleView();
+  else if(view==='vacancy') c.innerHTML=renderVacancyView();
+  else if(view==='myprefs') c.innerHTML=renderPrefView();
+  else if(view==='prefs') c.innerHTML=renderPrefOverview();
+  else if(view==='request') c.innerHTML=renderRequestForm();
+  else if(view==='myrequests') c.innerHTML=renderMyRequests();
+  else if(view==='reset'){ resetDemo(); return; }
+  bindView(view);
+  window.scrollTo(0,0);
+}
+
+function bindView(view){
+  if(view==='schedule') bindScheduleView();
+  if(view==='month') bindMonthView();
+  if(view==='requests') bindRequestsView();
+  if(view==='shifts') bindShiftsView();
+  if(view==='staff') bindStaffView();
+  if(view==='eschedule') bindESchedule();
+  if(view==='request') bindRequestForm();
+  if(view==='day') bindDayView();
+}
+
+/* ---------------- 更表（週視圖） ---------------- */
+function weekRangeLabel(){ return fmtFull(state.weekStart)+' 至 '+fmtFull(addDays(state.weekStart,6)); }
+function weekToolbar(branchName, editable, branchTabs){
+  const u=currentUser();
+  let h='<div class="page-title">🗓 更表（週視圖）</div>';
+  h+='<div class="page-sub">'+esc(branchName)+' · '+weekRangeLabel()+(editable?' · 點擊格子或拖曳班次即可排更':'')+'</div>';
+  if(branchTabs) h+=renderBranchTabs();
+  h+='<div class="toolbar">';
+  h+='<button class="btn btn-secondary" onclick="weekJump(-1)">‹ 上一週</button>';
+  h+='<button class="btn btn-secondary" onclick="weekJump(0)">本週</button>';
+  h+='<button class="btn btn-secondary" onclick="weekJump(1)">下一週 ›</button>';
+  h+='<span class="spacer"></span>';
+  h+='<button class="btn btn-secondary btn-sm" onclick="go(\'month\')">切換至月視圖</button>';
+  h+='<button class="btn btn-secondary btn-sm" onclick="go(\'day\')">切換至日視圖</button>';
+  if(u.role==='boss'||u.role==='manager') h+='<button class="btn btn-secondary btn-sm" onclick="exportCSV(\'week\')">⬇ 匯出CSV</button>';
+  if(u.role==='boss') h+='<button class="btn btn-secondary btn-sm" onclick="resetDemo()">重設示範</button>';
+  h+='</div>';
+  return h;
+}
+function renderBranchTabs(){
+  const active=userBranchId();
+  let h='<div class="branch-tabs">';
+  db.branches.forEach(b=>{
+    h+='<button class="branch-tab'+(b.id===active?' active':'')+'" onclick="setBossBranch(\''+b.id+'\')">'+esc(b.name)+'</button>';
+  });
+  h+='</div>';
+  return h;
+}
+function setBossBranch(id){ state.bossBranchId=id; go('schedule'); }
+function weekJump(dir){
+  if(dir===0) state.weekStart=getMonday(new Date());
+  else state.weekStart=addDays(state.weekStart, dir*7);
+  const u=currentUser();
+  if(u.role==='boss') go('schedule'); else if(u.role==='manager') go('schedule'); else go('eschedule');
+}
+function renderScheduleView(){
+  const u=currentUser();
+  const bId=userBranchId();
+  const branch=branchById(bId);
+  const editable = u.role==='manager';
+  let h=weekToolbar(branch.name, editable, u.role==='boss');
+  h+=quotaCleanupBanner();
+  h+='<div class="card"><div class="card-title">顏色圖例</div><div class="legend">';
+  db.shifts.forEach(s=>{ h+='<span class="item"><span class="swatch" style="background:'+s.color+'"></span>'+esc(s.name)+(s.crossDay?'（跨日）':'')+' · '+esc(s.start||'—')+'-'+esc(s.end||'—')+(s.break?' · 休息時間 '+esc(s.break):'')+'</span>'; });
+  h+='<span class="item"><span class="swatch" style="background:#5C9DFF"></span>全職員工（(全)）</span><span class="item"><span class="swatch" style="background:#FFA94D"></span>兼職員工（(兼)）</span>';
+  h+='</div></div>';
+  h+='<div class="card"><div class="card-title">🧮 班次配額總覽（已排 / 配額）</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px">全職 x/y = 已排全職 x 人 / 配額 y 人；兼職同。橙色為未達配額的空缺更份，兼職員工可於「空缺認投」頁自行認投。灰色「不適用」表示該班次當天按星期 / 公眾假期設定不適用。</div>'+renderQuotaOverview(bId)+'</div>';
+  if(editable){
+    h+='<div class="card"><div class="card-title">⚡ 自動填補兼職空缺</div>';
+    h+='<div style="font-size:12px;color:var(--muted);margin-bottom:10px">分配邏輯：① 優先安排已填寫「當日當更份偏好」的兼職員工；② 若某更份願意上班的兼職人數多於所需兼職人數，公平輪流分配——本週已排班次較少者優先，其次當月已排工時較少者優先；③ 全職員工照常優先排滿全職配額，此功能只自動填補兼職空缺。</div>';
+    h+='<button class="btn btn-primary" onclick="autoFillWeek()">⚡ 自動填補本週兼職空缺</button></div>';
+  }
+  if(editable){
+    h+='<div class="card"><div class="card-title">✏️ 排更編輯</div>';
+    h+='<div style="font-size:12px;color:var(--muted);margin-bottom:8px">① 拖曳下方班次至更表格子　② 點擊更表格子修改　③ 使用表單快速新增（儲存時會依星期 / 公眾假期設定檢查班次是否適用當日）</div>';
+    h+='<div class="shift-chips">';
+    db.shifts.forEach(s=>{
+      if(s.isRest) return;
+      h+='<div class="shift-chip" draggable="true" data-shift-id="'+s.id+'" style="background:'+s.color+';color:'+(s.id==='s_night'?'#fff':'#333')+'">'+esc(s.name)+'<small>'+esc(s.start)+'-'+esc(s.end)+(s.crossDay?'（跨日）':'')+'</small></div>';
+    });
+    h+='</div><div class="edit-form" style="margin-top:12px">';
+    h+='<div class="f-item"><label>員工</label><select id="f-emp">';
+    employeesOf(bId).forEach(e=>{ h+='<option value="'+e.id+'">'+empLabel(e)+'（'+esc(e.defaultPosition||'')+'）</option>'; });
+    h+='</select></div>';
+    h+='<div class="f-item"><label>日期</label><input type="date" id="f-date" value="'+toDateStr(state.weekStart)+'"></div>';
+    h+='<div class="f-item"><label>班次</label><select id="f-shift">';
+    db.shifts.forEach(s=>{ if(!s.isRest) h+='<option value="'+s.id+'">'+esc(s.name)+' · '+esc(s.start)+'-'+esc(s.end)+(s.crossDay?'（跨日）':'')+'</option>'; });
+    h+='</select></div>';
+    h+='<div class="f-item"><label>地點</label><select id="f-loc">';
+    locOptions(bId).forEach(l=>{ h+='<option>'+esc(l)+'</option>'; });
+    h+='</select></div>';
+    h+='<div class="f-item"><label>崗位</label><select id="f-pos">';
+    positionsOf().forEach(p=>{ h+='<option>'+esc(p.name)+'</option>'; });
+    h+='</select></div>';
+    h+='<div class="f-item"><button class="btn btn-primary" onclick="quickAdd()" style="width:100%">＋ 新增更表</button></div>';
+    h+='</div></div>';
+  }
+  h+='<div class="card">'+weekGridHTML(bId, editable)+'</div>';
+  return h;
+}
+
+function weekGridHTML(bId, editable){
+  const days=[...Array(7)].map((_,i)=>addDays(state.weekStart,i));
+  const emps=employeesOf(bId);
+  const m=schMap(bId);
+  let h='<table class="roster-table"><thead><tr><th class="emp-col">員工</th>';
+  days.forEach(d=>{ h+='<th>'+weekdayName(d)+'<br><small>'+fmtMD(d)+'</small></th>'; });
+  h+='</tr></thead><tbody>';
+  emps.forEach(emp=>{
+    const isMe=state.userId===emp.id;
+    const isPt=emp.empType==='parttime';
+    const rowCls=(isPt?' pt-row':' ft-row')+(isMe?' me-row':'');
+    let overMark='';
+    if(!isPt){
+      const wst=weekWorkStats(emp.id,bId);
+      const hMax=emp.ftHoursMax!=null?emp.ftHoursMax:40;
+      const dMax=emp.ftDaysMax!=null?emp.ftDaysMax:5;
+      if(wst.hours>hMax || wst.days>dMax) overMark='<br><span class="over-tag">⚠ 超標</span>';
+    }
+    h+='<tr class="'+rowCls.trim()+'"><td class="emp-col"><strong>'+empLabel(emp)+'</strong><br><small>'+esc(emp.defaultPosition||'')+'</small>'+overMark+'</td>';
+    days.forEach(d=>{
+      const ds=toDateStr(d);
+      const sch=m[emp.id+'|'+ds];
+      h+=cellHTML(emp.id, ds, sch, editable);
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  return h;
+}
+function cellHTML(eid, ds, sch, editable){
+  const leave = leaveOn(eid, ds);
+  if(leave){
+    const tip='員工 '+esc(userById(eid)?userById(eid).name:'')+' | '+ds+' | 請假('+esc(leave.type)+' '+esc(leave.dateFrom)+'~'+esc(leave.dateTo)+')';
+    return '<td class="cell leave-cell'+(editable?' editable':'')+'" data-eid="'+eid+'" data-date="'+ds+'" style="background:#F6D7D9" title="'+esc(tip)+'"><span class="shift-name">請假</span><small>'+esc(leave.type)+'</small></td>';
+  }
+  let bg='#fff', inner='<span class="shift-name">—</span>';
+  if(sch){
+    const st=shiftById(sch.shiftId);
+    if(st){ bg=st.color;
+      if(st.isRest){ inner='<span class="shift-name">休息</span>'; }
+      else{
+        inner='<span class="shift-name">'+esc(st.name)+'</span><small>'+esc(st.start)+'-'+esc(st.end)+(st.crossDay?'<sup>+1</sup>':'')+'</small><br><small class="tiny">'+esc(sch.location||'')+' · '+esc(sch.position||'')+'</small>';
+      }
+    }
+  }
+  const empName = userById(eid) ? userById(eid).name : '';
+  const stSh = sch ? shiftById(sch.shiftId) : null;
+  const shName = stSh ? stSh.name : '';
+  const tip = sch ? ('員工 '+esc(empName)+' | '+ds+' | '+esc(shName)+' | '+esc(sch.location||'')+' | '+esc(sch.position||'')) : '';
+  return '<td class="cell'+(editable?' editable':'')+'" data-eid="'+eid+'" data-date="'+ds+'" style="background:'+bg+'" title="'+esc(tip)+'">'+inner+'</td>';
+}
+function bindScheduleView(){
+  const u=currentUser();
+  const bId=userBranchId();
+  if(u.role!=='manager') return;
+  document.querySelectorAll('#content .cell.editable').forEach(cell=>{
+    cell.addEventListener('click', ()=>openEditModal(cell.dataset.eid, cell.dataset.date));
+    cell.addEventListener('dragover', e=>{ e.preventDefault(); cell.classList.add('drag-over'); });
+    cell.addEventListener('dragleave', ()=>cell.classList.remove('drag-over'));
+    cell.addEventListener('drop', e=>{
+      e.preventDefault(); cell.classList.remove('drag-over');
+      const shiftId=state.dragShiftId;
+      if(!shiftId) return;
+      const emp=userById(cell.dataset.eid); const b=branchById(bId);
+      const locs=locOptions(bId);
+      setSchedule(cell.dataset.eid, cell.dataset.date, shiftId, locs[0]||'', emp.defaultPosition||'');
+    });
+  });
+  bindShiftChips();
+}
+function bindShiftChips(){
+  document.querySelectorAll('.shift-chip[draggable="true"]').forEach(chip=>{
+    chip.addEventListener('dragstart', e=>{ state.dragShiftId=chip.dataset.shiftId; chip.classList.add('dragging'); });
+    chip.addEventListener('dragend', ()=>{ chip.classList.remove('dragging'); state.dragShiftId=null; });
+  });
+}
+function setSchedule(eid, ds, shiftId, location, position){
+  const u=currentUser();
+  const bId = u.role==='boss' ? state.bossBranchId : u.branchId;
+  const idx=db.schedules.findIndex(s=>s.employeeId===eid && s.date===ds);
+  const st=shiftById(shiftId);
+  if(!st || st.isRest){ if(idx>=0){ db.schedules.splice(idx,1); } }
+  else{
+    if(!shiftAppliesOn(st, ds)){
+      alert('該班次「'+st.name+'」不適用於 '+ds+'（星期 / 公眾假期設定不符），請選擇當日適用的班次。');
+      return false;
+    }
+    const sameShift = idx>=0 && db.schedules[idx].shiftId===shiftId;
+    if(!sameShift){
+      const alreadyThere=db.schedules.some(s=>s.employeeId===eid && s.date===ds && s.shiftId===shiftId);
+      if(!alreadyThere){
+        const emp=userById(eid);
+        const isPart = emp && emp.empType==='parttime';
+        const qst=quotaStatus(bId, ds, shiftId);
+        const dimMiss = isPart ? qst.missingPart : qst.missingFull;
+        if(dimMiss<=0){
+          alert('該更份的'+(isPart?'兼職':'全職')+'配額已滿（全職 '+qst.full+'/'+qst.qFull+'、兼職 '+qst.part+'/'+qst.qPart+'），無法再新增該類型排班，請先調整合員。');
+          return false;
+        }
+      }
+    }
+    const obj={ id:idx>=0?db.schedules[idx].id:genId(), branchId:bId, employeeId:eid, date:ds, shiftId, location:location||'', position:position||'' };
+    if(idx>=0) db.schedules[idx]=obj; else db.schedules.push(obj);
+  }
+  saveDB(); parttimeLimitAlert(eid, ds, shiftId); fulltimeLimitAlert(eid, ds, shiftId); go('schedule');
+}
+/* 編輯模態框 */
+function openEditModal(eid, ds){
+  const emp=userById(eid); if(!emp) return;
+  const bId=userBranchId();
+  const existing=db.schedules.find(s=>s.employeeId===eid && s.date===ds);
+  const curShift=existing?existing.shiftId:'';
+  const locs=locOptions(bId);
+  let opts='<option value="s_rest"'+(curShift==='s_rest'?' selected':'')+'>休息（清除排班）</option>';
+  applicableShifts(ds).forEach(s=>{ opts+='<option value="'+s.id+'"'+(s.id===curShift?' selected':'')+'>'+esc(s.name)+' · '+esc(s.start||'—')+'-'+esc(s.end||'—')+(s.crossDay?'（跨日）':'')+'</option>'; });
+  let locOpts=''; locs.forEach(l=>{ locOpts+='<option'+(existing&&existing.location===l?' selected':'')+'>'+esc(l)+'</option>'; });
+  let posOpts=''; positionsOf().forEach(p=>{ posOpts+='<option'+(existing&&existing.position===p.name?' selected':'')+'>'+esc(p.name)+'</option>'; });
+  const d=parseDate(ds);
+  const body=document.getElementById('modal-body');
+  body.innerHTML='<h3>編輯更表 · '+esc(emp.name)+' · '+fmtFull(d)+'</h3>'+
+    '<div class="form-row"><label>班次</label><select id="m-shift">'+opts+'</select></div>'+
+    '<div class="form-row"><label>地點</label><select id="m-loc">'+locOpts+'</select></div>'+
+    '<div class="form-row"><label>崗位</label><select id="m-pos">'+posOpts+'</select></div>'+
+    '<div class="m-actions"><button class="btn btn-secondary" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveEditModal(\''+eid+'\',\''+ds+'\')">儲存</button></div>';
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+}
+function saveEditModal(eid, ds){
+  const shiftId=document.getElementById('m-shift').value;
+  const loc=document.getElementById('m-loc').value;
+  const pos=document.getElementById('m-pos').value;
+  setSchedule(eid, ds, shiftId, loc, pos);
+  closeModal();
+}
+function closeModal(){ document.getElementById('modal-backdrop').classList.add('hidden'); }
+document.getElementById('modal-backdrop').addEventListener('click', e=>{ if(e.target.id==='modal-backdrop') closeModal(); });
+
+/* ---------------- 排更編輯介面（經理） ---------------- */
+function renderEditPage(){
+  const u=currentUser(); const bId=u.branchId; const branch=branchById(bId);
+  let h='<div class="page-title">✏️ 排更編輯</div><div class="page-sub">'+esc(branch.name)+' · 拖曳班次至更表格子，或使用下方表單快速新增</div>';
+  h+='<div class="card"><div class="card-title">班次模板（拖曳至更表）</div><div class="shift-chips">';
+  db.shifts.forEach(s=>{
+    if(s.isRest) return;
+    h+='<div class="shift-chip" draggable="true" data-shift-id="'+s.id+'" style="background:'+s.color+';color:'+(s.start==='22:00'?'#fff':'#333')+'">'+esc(s.name)+'<small>'+esc(s.start)+'-'+esc(s.end)+(s.crossDay?'（跨日）':'')+'</small></div>';
+  });
+  h+='</div><div style="font-size:12px;color:var(--muted)">💡 將班次拖到下方更表格子即可排更；點擊格子亦可編輯或改為休息。</div></div>';
+  h+='<div class="card"><div class="card-title">快速表單新增</div><div class="edit-form">';
+  h+='<div class="f-item"><label>員工</label><select id="f-emp">';
+  employeesOf(bId).forEach(e=>{ h+='<option value="'+e.id+'">'+esc(e.name)+'（'+esc(e.defaultPosition||'')+'）</option>'; });
+  h+='</select></div>';
+  h+='<div class="f-item"><label>日期</label><input type="date" id="f-date" value="'+toDateStr(state.weekStart)+'"></div>';
+  h+='<div class="f-item"><label>班次</label><select id="f-shift">';
+  db.shifts.forEach(s=>{ if(!s.isRest) h+='<option value="'+s.id+'">'+esc(s.name)+' · '+esc(s.start)+'-'+esc(s.end)+(s.crossDay?'（跨日）':'')+'</option>'; });
+  h+='</select></div>';
+  h+='<div class="f-item"><label>地點</label><select id="f-loc">';
+  locOptions(bId).forEach(l=>{ h+='<option>'+esc(l)+'</option>'; });
+  h+='</select></div>';
+  h+='<div class="f-item"><label>崗位</label><select id="f-pos">';
+  ['收銀','樓面','廚房','水吧','傳菜'].forEach(p=>{ h+='<option>'+p+'</option>'; });
+  h+='</select></div>';
+  h+='<div class="f-item"><button class="btn btn-primary" onclick="quickAdd()" style="width:100%">＋ 新增更表</button></div>';
+  h+='</div></div>';
+  h+='<div class="card">'+weekGridHTML(bId, true)+'</div>';
+  return h;
+}
+
+/* ---------------- 月視圖 ---------------- */
+function renderMonthViewPage(){
+  const u=currentUser(); const bId=userBranchId(); const branch=branchById(bId);
+  let h='<div class="page-title">📅 月視圖</div><div class="page-sub">'+esc(branch.name)+' · 每日出勤人數與班次分佈（點擊日期查看詳情）</div>';
+  if(u.role==='boss') h+=renderBranchTabs();
+  h+='<div class="toolbar">';
+  h+='<button class="btn btn-secondary" onclick="monthJump(-1)">‹ 上月</button>';
+  h+='<button class="btn btn-secondary" onclick="monthJump(0)">本月</button>';
+  h+='<button class="btn btn-secondary" onclick="monthJump(1)">下月 ›</button>';
+  h+='<span class="spacer"></span><strong style="font-size:16px">'+(state.monthY)+' 年 '+(state.monthM+1)+' 月</strong>';
+  h+='<span class="spacer"></span><button class="btn btn-secondary btn-sm" onclick="go(\'schedule\')">切換至週視圖</button>';
+  if(u.role==='boss'||u.role==='manager') h+='<button class="btn btn-secondary btn-sm" onclick="exportCSV(\'month\')">⬇ 匯出CSV</button>';
+  h+='</div>';
+  h+=renderEmpLegend();
+  h+='<div class="card"><div class="month-grid">';
+  ['一','二','三','四','五','六','日'].forEach(w=>{ h+='<div class="m-head">週'+w+'</div>'; });
+  const first=new Date(state.monthY, state.monthM, 1);
+  const lead=(first.getDay()+6)%7;
+  const daysInMonth=new Date(state.monthY, state.monthM+1, 0).getDate();
+  const today=todayStr();
+  for(let i=0;i<lead;i++) h+='<div></div>';
+  for(let day=1;day<=daysInMonth;day++){
+    const d=new Date(state.monthY, state.monthM, day);
+    const ds=toDateStr(d);
+    const att=attendanceOf(bId, ds);
+    const m=schMap(bId); const cnt={};
+    employeesOf(bId).forEach(e=>{ const s=m[e.id+'|'+ds]; if(s && isWorking(s) && !leaveOn(e.id,ds)){ const st=shiftById(s.shiftId); cnt[st.name]=(cnt[st.name]||0)+1; } });
+    let lines='';
+    db.shifts.forEach(s=>{ if(!s.isRest && cnt[s.name]) lines+='<span class="m-shift-line" style="background:'+s.color+'">'+esc(s.name)+' '+cnt[s.name]+'人</span>'; });
+    h+='<div class="month-cell'+(ds===today?' today':'')+'" data-date="'+ds+'"><div class="d-num">'+day+'</div><div class="m-att">出勤 '+att+' 人</div><div class="m-shifts">'+lines+'</div></div>';
+  }
+  h+='</div></div>';
+  return h;
+}
+function monthJump(dir){
+  if(dir===0){ const d=new Date(); state.monthY=d.getFullYear(); state.monthM=d.getMonth(); }
+  else{ state.monthM+=dir; if(state.monthM<0){ state.monthM=11; state.monthY--; } if(state.monthM>11){ state.monthM=0; state.monthY++; } }
+  go('month');
+}
+function bindMonthView(){
+  document.querySelectorAll('.month-cell[data-date]').forEach(cell=>{
+    cell.addEventListener('click', ()=>openDayDetail(cell.dataset.date));
+  });
+}
+function openDayDetail(ds){
+  const bId=userBranchId();
+  const m=schMap(bId); const emps=employeesOf(bId);
+  const d=parseDate(ds);
+  let rows='';
+  emps.forEach(e=>{
+    const s=m[e.id+'|'+ds];
+    const st=s?shiftById(s.shiftId):null;
+    rows+='<tr><td>'+esc(e.name)+'</td><td>'+(st?esc(st.name):'—')+'</td><td>'+(st&&!st.isRest?esc(st.start)+'-'+esc(st.end)+(st.crossDay?'（跨日）':''):'—')+'</td><td>'+(s?esc(s.location||''):'—')+'</td><td>'+(s?esc(s.position||''):'—')+'</td></tr>';
+  });
+  const body=document.getElementById('modal-body');
+  body.innerHTML='<h3>'+fmtFull(d)+' 更表明細 · '+esc(branchById(bId).name)+'</h3><table class="data-table"><thead><tr><th>員工</th><th>班次</th><th>時間</th><th>地點</th><th>崗位</th></tr></thead><tbody>'+rows+'</tbody></table><div class="m-actions"><button class="btn btn-secondary" onclick="closeModal()">關閉</button></div>';
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+}
+
+/* ---------------- 請求 ---------------- */
+function renderRequestsView(){
+  const u=currentUser();
+  let h;
+  if(u.role==='manager'){
+    const bId=u.branchId;
+    h='<div class="page-title">📨 請求覆核</div><div class="page-sub">'+esc(branchById(bId).name)+' · 覆核員工提交的請假請求（批准 / 拒絕）</div>';
+    const pending=db.requests.filter(r=>r.branchId===bId && r.status==='pending');
+    h+='<div class="card"><div class="card-title">待覆核（'+pending.length+'）</div>';
+    if(!pending.length) h+='<div style="color:var(--muted)">暫時沒有待覆核的請求。</div>';
+    pending.forEach(r=>{ h+=reqCardHTML(r, true); });
+    h+='</div>';
+    const done=db.requests.filter(r=>r.branchId===bId && r.status!=='pending');
+    h+='<div class="card"><div class="card-title">已處理（'+done.length+'）</div>';
+    done.forEach(r=>{ h+=reqCardHTML(r, false); });
+    h+='</div>';
+  } else if(u.role==='boss'){
+    h='<div class="page-title">📨 公司請求</div><div class="page-sub">全公司所有分店的請假請求（可審核處理 / 編輯狀態）</div>';
+    db.branches.forEach(b=>{
+      const list=db.requests.filter(r=>r.branchId===b.id);
+      h+='<div class="card"><div class="card-title">'+esc(b.name)+'（'+list.length+'）</div>';
+      if(!list.length) h+='<div style="color:var(--muted)">暫無請求。</div>';
+      list.forEach(r=>{ h+=reqCardHTML(r, true); });
+      h+='</div>';
+    });
+  }
+  return h;
+}
+function reqCardHTML(r, actionable){
+  const emp=userById(r.employeeId);
+  const st={pending:'待覆核',approved:'已批准',rejected:'已拒絕'}[r.status];
+  const stCls={pending:'p0',approved:'p1',rejected:'p2'}[r.status];
+  let h='<div class="req-card"><div class="r-info"><b>'+esc(emp?emp.name:'?')+'</b> · '+esc(r.type)+' <span class="badge badge-'+r.status+'">'+st+'</span><br><small>'+esc(r.dateFrom)+' 至 '+esc(r.dateTo)+' · '+esc(r.note||'')+'</small>';
+  if(r.attachment && r.attachment.data){
+    const att=r.attachment;
+    if(/^image\//.test(att.type||'')){
+      h+='<br><a href="'+esc(att.data)+'" target="_blank" rel="noopener"><img src="'+esc(att.data)+'" style="max-height:60px;max-width:130px;border-radius:6px;border:1px solid var(--border);margin-top:4px" alt="附件"></a>';
+    } else {
+      h+='<br><a href="'+esc(att.data)+'" target="_blank" rel="noopener" style="font-size:12px">📎 '+esc(att.name||'附件')+'</a>';
+    }
+  }
+  if(r.editedAt) h+='<br><small>最後編輯：'+fmtDateTime(r.editedAt)+'</small>';
+  if(r.rejectReason) h+='<br><small style="color:#d33">拒絕原因：'+esc(r.rejectReason)+'</small>';
+  if(r.processedAt) h+='<br><small>處理：'+esc(r.processedBy||'')+' @ '+fmtDateTime(r.processedAt)+'</small>';
+  h+='</div>';
+  if(actionable){
+    h+='<button class="btn btn-success btn-sm" onclick="reviewRequest(\''+r.id+'\',\'approved\')">✓ 批准</button>';
+    h+='<button class="btn btn-danger btn-sm" onclick="reviewRequest(\''+r.id+'\',\'rejected\')">✕ 拒絕</button>';
+  }
+  h+='<button class="btn btn-secondary btn-sm" onclick="openHistoryModal(\''+r.id+'\')">🕒 處理記錄</button>';
+  h+='<button class="btn btn-secondary btn-sm" onclick="openEditRequestModal(\''+r.id+'\')">✏️ 編輯狀態</button>';
+  h+='</div>';
+  return h;
+}
+function reviewRequest(id, status){
+  const r=db.requests.find(x=>x.id===id); if(!r) return;
+  const u=currentUser();
+  let reason='';
+  if(status==='rejected'){
+    reason=prompt('請填寫拒絕原因（必填）：');
+    if(reason==null) return;
+    reason=reason.trim();
+    if(!reason){ alert('拒絕原因不能為空。'); return; }
+  }
+  r.status=status;
+  r.processedAt=new Date().toISOString();
+  r.processedBy=u.name;
+  if(status==='rejected') r.rejectReason=reason; else if(status==='approved') r.rejectReason='';
+  r.history.push({status:status, at:r.processedAt, by:u.name, reason:reason});
+  saveDB(); go('requests');
+}
+function bindRequestsView(){}
+
+/* ---------------- 經理數據 ---------------- */
+function renderStatsView(){
+  const u=currentUser(); const bId=u.branchId; const branch=branchById(bId);
+  const days=[...Array(7)].map((_,i)=>addDays(state.weekStart,i));
+  const ws=toDateStr(state.weekStart); const we=toDateStr(addDays(state.weekStart,6));
+  const inWeek=(d)=>{ return d>=ws && d<=we; };
+  const m=schMap(bId); const emps=employeesOf(bId);
+  const att=days.map(d=>attendanceOf(bId,toDateStr(d)));
+  const maxAtt=Math.max(...att,1);
+  const shiftTot={};
+  db.shifts.forEach(s=>{ shiftTot[s.id]={name:s.name,color:s.color,count:0,hours:0}; });
+  let totalHours=0;
+  db.schedules.forEach(s=>{
+    if(s.branchId!==bId || !isWorking(s) || leaveOn(s.employeeId,s.date) || !inWeek(s.date)) return;
+    const st=shiftById(s.shiftId); if(!st) return;
+    shiftTot[s.shiftId].count++;
+    const hrs=hoursBetween(st.start,st.end,st.crossDay,st.break);
+    shiftTot[s.shiftId].hours+=hrs; totalHours+=hrs;
+  });
+  let h='<div class="page-title">📈 分店數據</div><div class="page-sub">'+esc(branch.name)+' · 出勤與班次統計</div>';
+  h+=weekNavHTML('statsWeekJump');
+  h+='<div class="stat-grid">';
+  h+='<div class="stat-card"><div class="num">'+emps.length+'</div><div class="lbl">員工總數</div></div>';
+  h+='<div class="stat-card"><div class="num">'+db.schedules.filter(s=>s.branchId===bId && isWorking(s) && !leaveOn(s.employeeId,s.date) && inWeek(s.date)).length+'</div><div class="lbl">本週總班次</div></div>';
+  h+='<div class="stat-card"><div class="num">'+totalHours.toFixed(1)+'</div><div class="lbl">本週總工時（小時）</div></div>';
+  h+='<div class="stat-card"><div class="num">'+db.requests.filter(r=>r.branchId===bId && r.status==='pending').length+'</div><div class="lbl">待覆核請求</div></div>';
+  h+='</div>';
+  h+='<div class="card"><div class="card-title">本週每日出勤人數</div>';
+  days.forEach((d,i)=>{
+    const pct=Math.round(att[i]/maxAtt*100);
+    h+='<div class="bar-row"><span class="b-label">'+weekdayName(d).slice(0,1)+'/'+fmtMD(d)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.max(pct,6)+'%"></div></div><span class="b-val">'+att[i]+' 人</span></div>';
+  });
+  h+='</div>';
+  h+='<div class="card"><div class="card-title">班次分佈</div>';
+  const maxCnt=Math.max(...Object.values(shiftTot).map(v=>v.count),1);
+  Object.values(shiftTot).forEach(v=>{
+    const pct=Math.round(v.count/maxCnt*100);
+    h+='<div class="bar-row"><span class="b-label"><span class="swatch" style="width:14px;height:14px;border-radius:4px;background:'+v.color+';display:inline-block;vertical-align:middle"></span> '+esc(v.name)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.max(pct,6)+'%;background:'+v.color+'"></div></div><span class="b-val">'+v.count+' 次</span></div>';
+  });
+  h+='</div>';
+  h+='<div class="card"><div class="card-title">員工本週排班時數</div><table class="data-table"><thead><tr><th>員工</th><th>崗位</th><th>本週班次</th><th>總工時（小時）</th><th>狀態</th></tr></thead><tbody>';
+  emps.forEach(e=>{
+    let cnt=0, hrs=0;
+    db.schedules.forEach(s=>{
+      if(s.branchId===bId && s.employeeId===e.id && isWorking(s) && !leaveOn(s.employeeId,s.date) && inWeek(s.date)){
+        const st=shiftById(s.shiftId); cnt++;
+        hrs+=hoursBetween(st.start,st.end,st.crossDay,st.break);
+      }
+    });
+    let stTxt='<span style="color:var(--muted)">—</span>';
+    if(e.empType==='fulltime'){
+      const hMax=e.ftHoursMax!=null?e.ftHoursMax:40;
+      const dMax=e.ftDaysMax!=null?e.ftDaysMax:5;
+      const overH=hrs>hMax, overD=cnt>dMax;
+      stTxt=overH||overD?'<span class="over-tag">⚠ 超標（限 '+hMax+' 時 / '+dMax+' 日）</span>':'<span style="color:#2a2">正常（限 '+hMax+' 時 / '+dMax+' 日）</span>';
+    } else if(e.empType==='parttime'){
+      const cmArr=nowMonth(); const hrsM=monthWorkHours(e.id, cmArr[0], cmArr[1]);
+      stTxt=hrsM>68?'<span style="color:#d33;font-weight:bold">⚠ 兼職月超時</span>':'<span style="color:var(--muted)">兼職</span>';
+    }
+    h+='<tr><td>'+empLabel(e)+'</td><td>'+esc(e.defaultPosition||'')+'</td><td>'+cnt+'</td><td>'+hrs.toFixed(1)+'</td><td>'+stTxt+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  const cmArr=nowMonth(); const cmY=cmArr[0]; const cmM=cmArr[1];
+  const ftEmps=db.users.filter(x=>x.role==='employee' && x.branchId===bId && x.empType==='fulltime');
+  h+='<div class="card"><div class="card-title">全職工時 / 日數上限設定（每週）</div>';
+  if(!ftEmps.length){
+    h+='<div style="color:var(--muted)">本分店沒有全職員工。</div>';
+  } else {
+    h+='<table class="data-table"><thead><tr><th>員工</th><th>每週工時上限</th><th>每週日數上限</th><th>本週已排工時</th><th>本週已排日數</th><th>狀態</th></tr></thead><tbody>';
+    ftEmps.forEach(e=>{
+      const hMax=e.ftHoursMax!=null?e.ftHoursMax:40;
+      const dMax=e.ftDaysMax!=null?e.ftDaysMax:5;
+      const wst=weekWorkStats(e.id, bId);
+      const over=wst.hours>hMax || wst.days>dMax;
+      h+='<tr><td>'+esc(e.name)+'</td><td>'+hMax+' 小時</td><td>'+dMax+' 日</td><td'+(wst.hours>hMax?' style="color:#d33;font-weight:bold"':'')+'>'+wst.hours+' 小時</td><td'+(wst.days>dMax?' style="color:#d33;font-weight:bold"':'')+'>'+wst.days+' 日</td><td>'+(over?'<span style="color:#d33;font-weight:bold">⚠ 已超標</span>':'<span style="color:#2a2">正常</span>')+'</td></tr>';
+    });
+    h+='</tbody></table>';
+  }
+  h+='</div>';
+  const ptEmps=db.users.filter(x=>x.role==='employee' && x.branchId===bId && x.empType==='parttime');
+  h+='<div class="card"><div class="card-title">兼職工時監控（當月上限 68 小時）</div>';
+  if(!ptEmps.length){
+    h+='<div style="color:var(--muted)">本分店沒有兼職員工。</div>';
+  } else {
+    h+='<table class="data-table"><thead><tr><th>員工</th><th>當月已排工時</th><th>上限</th><th>狀態</th></tr></thead><tbody>';
+    ptEmps.forEach(e=>{
+      const hrs=monthWorkHours(e.id, cmY, cmM);
+      const over=hrs>68;
+      h+='<tr><td>'+esc(e.name)+'</td><td'+(over?' style="color:#d33;font-weight:bold"':'')+'>'+hrs+' 小時</td><td>68 小時</td><td>'+(over?'<span style="color:#d33;font-weight:bold">⚠ 已超時</span>':'<span style="color:#2a2">正常</span>')+'</td></tr>';
+    });
+    h+='</tbody></table>';
+  }
+  h+='</div>';
+  return h;
+}
+
+/* ---------------- 老闆儀表板 ---------------- */
+function renderDashboard(){
+  const u=currentUser();
+  const days=[...Array(7)].map((_,i)=>addDays(state.weekStart,i));
+  const ws=toDateStr(state.weekStart); const we=toDateStr(addDays(state.weekStart,6));
+  const inWeek=(d)=>{ return d>=ws && d<=we; };
+  const totalEmp=db.users.filter(x=>x.role==='employee').length;
+  const totalSched=db.schedules.filter(s=>isWorking(s) && inWeek(s.date)).length;
+  const pending=db.requests.filter(r=>r.status==='pending').length;
+  let h='<div class="page-title">📊 總覽儀表板</div><div class="page-sub">'+esc(db.company.name)+' · 全公司各分店營運數據</div>';
+  h+=weekNavHTML('dashWeekJump');
+  h+='<div class="stat-grid">';
+  h+='<div class="stat-card"><div class="num">'+db.branches.length+'</div><div class="lbl">分店數目</div></div>';
+  h+='<div class="stat-card"><div class="num">'+totalEmp+'</div><div class="lbl">員工總數</div></div>';
+  h+='<div class="stat-card"><div class="num">'+totalSched+'</div><div class="lbl">本週總班次</div></div>';
+  h+='<div class="stat-card"><div class="num">'+pending+'</div><div class="lbl">待覆核請求</div></div>';
+  h+='</div>';
+  db.branches.forEach(b=>{
+    const emps=employeesOf(b.id);
+    const att=days.map(d=>attendanceOf(b.id,toDateStr(d)));
+    const maxAtt=Math.max(...att,1);
+    const m=schMap(b.id);
+    const shiftCnt={};
+    db.shifts.forEach(s=>{ shiftCnt[s.id]={name:s.name,color:s.color,count:0}; });
+    db.schedules.forEach(s=>{ if(s.branchId===b.id && isWorking(s) && !leaveOn(s.employeeId,s.date) && inWeek(s.date) && shiftCnt[s.shiftId]) shiftCnt[s.shiftId].count++; });
+    h+='<div class="card"><div class="card-title">'+esc(b.name)+' <span style="font-weight:400;font-size:12px;color:var(--muted)">'+esc(b.address)+'</span></div>';
+    const ptArr=nowMonth(); const ptY=ptArr[0]; const ptM=ptArr[1];
+    const ptOver=db.users.filter(x=>x.role==='employee' && x.branchId===b.id && x.empType==='parttime' && monthWorkHours(x.id, ptY, ptM)>68);
+    if(ptOver.length) h+='<div style="color:#d33;font-weight:bold;margin-bottom:6px">⚠ 兼職超時（'+ptOver.length+' 人）：'+ptOver.map(x=>esc(x.name)).join('、')+'</div>';
+    const ftOver=db.users.filter(x=>x.role==='employee' && x.branchId===b.id && x.empType==='fulltime' && (function(xx){ const wst=weekWorkStats(xx.id, b.id); return wst.hours>(xx.ftHoursMax!=null?xx.ftHoursMax:40) || wst.days>(xx.ftDaysMax!=null?xx.ftDaysMax:5); })(x));
+    if(ftOver.length) h+='<div style="color:#d33;font-weight:bold;margin-bottom:6px">⚠ 全職工時超標（'+ftOver.length+' 人）：'+ftOver.map(x=>esc(x.name)).join('、')+'</div>';
+    h+='<div style="font-size:12px;color:var(--muted);margin-bottom:8px">本週每日出勤人數（員工 '+emps.length+' 人）</div>';
+    days.forEach((d,i)=>{
+      const pct=Math.round(att[i]/maxAtt*100);
+      h+='<div class="bar-row"><span class="b-label">'+weekdayName(d).slice(0,1)+'/'+fmtMD(d)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.max(pct,6)+'%"></div></div><span class="b-val">'+att[i]+' 人</span></div>';
+    });
+    h+='<div style="font-size:12px;color:var(--muted);margin:12px 0 8px">本週班次統計</div><div style="display:flex;gap:10px;flex-wrap:wrap">';
+    Object.values(shiftCnt).forEach(v=>{
+      h+='<span class="item" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;background:'+v.color+';padding:5px 12px;border-radius:8px;color:#333"><b>'+esc(v.name)+'</b> '+v.count+' 次</span>';
+    });
+    h+='</div><div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">';
+    h+='<button class="btn btn-secondary btn-sm" onclick="setBossBranch(\''+b.id+'\');go(\'schedule\')">查看更表</button>';
+    h+='<button class="btn btn-secondary btn-sm" onclick="setBossBranch(\''+b.id+'\');go(\'month\')">月視圖</button>';
+    h+='</div></div>';
+  });
+  h+='<div class="card"><div class="card-title">全公司本週班次統計</div><table class="data-table"><thead><tr><th>班次</th><th>時間</th><th>中環分店</th><th>旺角分店</th><th>合計</th></tr></thead><tbody>';
+  db.shifts.forEach(s=>{
+    if(s.isRest) return;
+    const c1=db.schedules.filter(x=>x.branchId==='b1'&&x.shiftId===s.id&&isWorking(x)&&inWeek(x.date)).length;
+    const c2=db.schedules.filter(x=>x.branchId==='b2'&&x.shiftId===s.id&&isWorking(x)&&inWeek(x.date)).length;
+    h+='<tr><td><span class="swatch" style="width:12px;height:12px;border-radius:3px;background:'+s.color+';display:inline-block;margin-right:6px"></span>'+esc(s.name)+'</td><td>'+esc(s.start)+'-'+esc(s.end)+(s.crossDay?'（跨日）':'')+'</td><td>'+c1+'</td><td>'+c2+'</td><td><b>'+(c1+c2)+'</b></td></tr>';
+  });
+  h+='</tbody></table></div>';
+  return h;
+}
+
+/* ---------------- 員工視圖 ---------------- */
+function renderEScheduleView(){
+  const u=currentUser(); const branch=branchById(u.branchId);
+  let h=weekToolbar(branch.name, false, false);
+  h+='<div class="card"><div class="card-title">顏色圖例</div><div class="legend">';
+  db.shifts.forEach(s=>{ h+='<span class="item"><span class="swatch" style="background:'+s.color+'"></span>'+esc(s.name)+(s.crossDay?'（跨日）':'')+' · '+esc(s.start||'—')+'-'+esc(s.end||'—')+(s.break?' · 休息時間 '+esc(s.break):'')+'</span>'; });
+  h+='</div></div>';
+  h+='<div class="card"><div class="page-sub" style="margin-bottom:10px">🔆 黃色高亮為您的班次</div>'+weekGridHTML(u.branchId, false)+'</div>';
+  return h;
+}
+function bindESchedule(){}
+function renderRequestForm(){
+  const u=currentUser();
+  let h='<div class="page-title">📝 提交請求</div><div class="page-sub">請選擇請假類型及日期範圍（病假 / 事假 / 年假），可上載醫生紙等證明文件；提交後由分店經理覆核。</div>';
+  h+='<div class="card" style="max-width:560px"><div class="card-title">新增請求</div>';
+  h+='<div class="form-row"><label>請假類型</label><select id="r-type"><option>病假</option><option>事假</option><option>年假</option></select></div>';
+  h+='<div class="form-row"><label>開始日期</label><input type="date" id="r-from" value="'+todayStr()+'"></div>';
+  h+='<div class="form-row"><label>結束日期</label><input type="date" id="r-to" value="'+todayStr()+'"></div>';
+  h+='<div class="form-row"><label>原因 / 備註</label><textarea id="r-note" rows="3" style="width:100%" placeholder="請簡述請假原因"></textarea></div>';
+  h+='<div class="form-row"><label>附件（選填：醫生紙 / 證明，圖片或 PDF，≤2MB）</label><input type="file" id="r-attach" accept="image/*,.pdf,.doc,.docx"></div>';
+  h+='<button class="btn btn-primary" onclick="submitRequest()">提交請求</button>';
+  h+='</div>';
+  return h;
+}
+function submitRequest(){
+  const u=currentUser();
+  const type=document.getElementById('r-type').value;
+  const from=document.getElementById('r-from').value;
+  const to=document.getElementById('r-to').value;
+  const note=document.getElementById('r-note').value.trim();
+  if(!from||!to){ alert('請選擇日期範圍。'); return; }
+  if(from>to){ alert('結束日期不能早於開始日期。'); return; }
+  readAttachInput('r-attach', att=>{
+    db.requests.push({ id:genId(), employeeId:u.id, branchId:u.branchId, type, dateFrom:from, dateTo:to, note, status:'pending', createdAt:new Date().toISOString(), attachment:att, history:[] });
+    saveDB(); alert('請求已提交，等待經理覆核。'); go('myrequests');
+  });
+}
+function bindRequestForm(){}
+function renderMyRequests(){
+  const u=currentUser();
+  const list=db.requests.filter(r=>r.employeeId===u.id).sort((a,b)=>b.dateFrom.localeCompare(a.dateFrom));
+  let h='<div class="page-title">📬 我的請求</div><div class="page-sub">查看與編輯已提交的請求；每次編輯都會記錄修改時間。</div>';
+  h+='<div class="card"><div class="card-title">請求記錄（'+list.length+'）</div>';
+  if(!list.length) h+='<div style="color:var(--muted)">您尚未提交任何請求。</div>';
+  list.forEach(r=>{
+    const st={pending:'待覆核',approved:'已批准',rejected:'已拒絕'}[r.status];
+    const stCls={pending:'p0',approved:'p1',rejected:'p2'}[r.status];
+    h+='<div class="req-card"><div class="r-info"><b>'+esc(r.type)+'</b> · '+esc(r.dateFrom)+' 至 '+esc(r.dateTo)+'<br><small>'+esc(r.note||'')+'</small>';
+    if(r.attachment && r.attachment.data){
+      const att=r.attachment;
+      if(/^image\//.test(att.type||'')){
+        h+='<br><a href="'+esc(att.data)+'" target="_blank" rel="noopener"><img src="'+esc(att.data)+'" style="max-height:56px;max-width:120px;border-radius:6px;border:1px solid var(--border);margin-top:4px" alt="附件"></a>';
+      } else {
+        h+='<br><a href="'+esc(att.data)+'" target="_blank" rel="noopener" style="font-size:12px">📎 '+esc(att.name||'附件')+'</a>';
+      }
+    }
+    if(r.editedAt) h+='<br><small>最後編輯：'+fmtDateTime(r.editedAt)+'</small>';
+    if(r.rejectReason) h+='<br><small style="color:#d33">拒絕原因：'+esc(r.rejectReason)+'</small>';
+    if(r.processedAt) h+='<br><small>處理：'+esc(r.processedBy||'')+' @ '+fmtDateTime(r.processedAt)+'</small>';
+    h+='</div><span class="status-pill '+stCls+'">'+st+'</span>'
+      +'<button class="btn btn-secondary btn-sm" onclick="openEditMyRequestModal(\''+r.id+'\')">✏️ 編輯</button>'
+      +'<button class="btn btn-secondary btn-sm" onclick="openHistoryModal(\''+r.id+'\')">🕒 處理記錄</button></div>';
+  });
+  h+='</div>';
+  return h;
+}
+function bindMyRequests(){}
+
+/* ---------------- 兼職工時 / 班次設定 / 員工管理 / 請求歷史 ---------------- */
+function nowMonth(){ const d=new Date(); return [d.getFullYear(), d.getMonth()]; }
+function fmtDateTime(iso){
+  if(!iso) return '—';
+  const d=new Date(iso);
+  return d.getFullYear()+'/'+String(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function monthWorkHours(empId, y, m){
+  let total=0;
+  db.schedules.forEach(s=>{
+    if(s.employeeId!==empId || !isWorking(s) || leaveOn(s.employeeId,s.date)) return;
+    const p=s.date.split('-'); const sy=parseInt(p[0],10); const sm=parseInt(p[1],10)-1;
+    if(sy!==y || sm!==m) return;
+    const st=shiftById(s.shiftId); if(!st) return;
+    total+=hoursBetween(st.start,st.end,st.crossDay,st.break);
+  });
+  return Math.round(total*10)/10;
+}
+function parttimeLimitAlert(eid, ds, shiftId){
+  const u=db.users.find(x=>x.id===eid); if(!u || u.empType!=='parttime') return false;
+  const st=shiftById(shiftId); if(!st || st.isRest) return false;
+  const add=hoursBetween(st.start,st.end,st.crossDay,st.break);
+  const mArr=nowMonth();
+  let base=0;
+  db.schedules.forEach(s=>{
+    if(s.employeeId!==eid || !isWorking(s) || leaveOn(s.employeeId,s.date)) return;
+    if(ds && s.date===ds) return;
+    const p=s.date.split('-'); const sy=parseInt(p[0],10); const sm=parseInt(p[1],10)-1;
+    if(sy!==mArr[0] || sm!==mArr[1]) return;
+    const st2=shiftById(s.shiftId); if(!st2) return;
+    base+=hoursBetween(st2.start,st2.end,st2.crossDay,st2.break);
+  });
+  const total=Math.round((base+add)*10)/10;
+  if(total>68){
+    alert('警告：兼職員工「'+u.name+'」本月已排 '+Math.round(base*10)/10+' 小時，加上本次新增 '+add+' 小時共 '+total+' 小時，已超過 68 小時上限！請留意排班安排。');
+    return true;
+  }
+  return false;
+}
+function renderShiftsView(){
+  const u=currentUser();
+  let h='<div class="page-title">⏱ 班次設定</div><div class="page-sub">調整各班次開始/結束時間、跨日標記、休息（午膳）時間、顏色、所需人數配額（全職 / 兼職）與適用星期（含公眾假期）；可新增或刪除班次（刪除會一併移除引用該班次的排班）。</div>';
+  db.shifts.forEach(s=>{
+    if(s.isRest) return;
+    const used=db.schedules.filter(x=>x.shiftId===s.id && isWorking(x)).length;
+    h+='<div class="card"><div class="card-title"><span class="swatch" style="width:14px;height:14px;border-radius:4px;background:'+s.color+';display:inline-block;vertical-align:middle"></span> '+esc(s.name)+'（'+esc(s.start)+'-'+esc(s.end)+(s.crossDay?' 跨日':'')+'）</div>';
+    h+='<div class="form-row"><label>班次名稱</label><input id="sh-name-'+s.id+'" value="'+esc(s.name)+'"></div>';
+    h+='<div class="form-row"><label>開始時間</label><input type="time" id="sh-start-'+s.id+'" value="'+esc(s.start)+'"></div>';
+    h+='<div class="form-row"><label>結束時間</label><input type="time" id="sh-end-'+s.id+'" value="'+esc(s.end)+'"></div>';
+    h+='<div class="form-row"><label>跨日（次日結束）</label><select id="sh-cross-'+s.id+'"><option value="0"'+(s.crossDay?'':' selected')+'>否</option><option value="1"'+(s.crossDay?' selected':'')+'>是</option></select></div>';
+    h+='<div class="form-row"><label>休息時間（午膳）</label><input id="sh-break-'+s.id+'" value="'+esc(s.break)+'" placeholder="如 12:00-13:00"></div>';
+    h+='<div class="form-row"><label>所需人數（全職）</label><input type="number" min="0" id="sh-qf-'+s.id+'" value="'+(s.quotaFull||0)+'"></div>';
+    h+='<div class="form-row"><label>所需人數（兼職）</label><input type="number" min="0" id="sh-qp-'+s.id+'" value="'+(s.quotaPart||0)+'"></div>';
+    h+='<div class="form-row"><label>班次顏色（更表顯示用）</label><input type="color" id="sh-color-'+s.id+'" value="'+esc(s.color)+'" style="height:34px;width:70px;padding:2px;cursor:pointer"></div>';
+    h+='<div class="form-row"><label>適用星期（可多選）</label><div class="day-chips">';
+    const dOpts=[['1','一'],['2','二'],['3','三'],['4','四'],['5','五'],['6','六'],['7','日']];
+    dOpts.forEach(function(o){
+      const on = Array.isArray(s.days) ? s.days.indexOf(+o[0])>=0 : true;
+      h+='<label class="chip"><input type="checkbox" id="sh-day-'+s.id+'-'+o[0]+'" value="'+o[0]+'"'+(on?' checked':'')+'>週'+o[1]+'</label>';
+    });
+    const onHol = Array.isArray(s.days) ? s.days.indexOf(0)>=0 : true;
+    h+='<label class="chip"><input type="checkbox" id="sh-day-'+s.id+'-0" value="0"'+(onHol?' checked':'')+'>公眾假期</label>';
+    h+='</div></div>';
+    h+='<div class="m-actions"><button class="btn btn-primary" onclick="saveShift(\''+s.id+'\')">儲存班次</button>';
+    h+='<button class="btn btn-danger" onclick="deleteShift(\''+s.id+'\')">刪除班次</button>';
+    h+='<span style="font-size:11px;color:var(--muted);align-self:center">已被排班引用 '+used+' 筆</span></div></div>';
+  });
+  h+='<div class="card"><div class="card-title">＋ 新增班次</div>';
+  h+='<div class="form-row"><label>班次名稱</label><input id="ash-name" placeholder="如 早班"></div>';
+  h+='<div class="form-row"><label>開始時間</label><input type="time" id="ash-start" value="09:00"></div>';
+  h+='<div class="form-row"><label>結束時間</label><input type="time" id="ash-end" value="18:00"></div>';
+  h+='<div class="form-row"><label>跨日（次日結束）</label><select id="ash-cross"><option value="0">否</option><option value="1">是</option></select></div>';
+  h+='<div class="form-row"><label>休息時間（午膳）</label><input id="ash-break" value="" placeholder="如 12:00-13:00"></div>';
+  h+='<div class="form-row"><label>所需人數（全職）</label><input type="number" min="0" id="ash-qf" value="2"></div>';
+  h+='<div class="form-row"><label>所需人數（兼職）</label><input type="number" min="0" id="ash-qp" value="1"></div>';
+  h+='<div class="form-row"><label>班次顏色</label><input type="color" id="ash-color" value="#FFD966" style="height:34px;width:70px;padding:2px;cursor:pointer"></div>';
+  h+='<div class="form-row"><label>適用星期（可多選）</label><div class="day-chips">';
+  const dOpts2=[['1','一'],['2','二'],['3','三'],['4','四'],['5','五'],['6','六'],['7','日']];
+  dOpts2.forEach(function(o){
+    h+='<label class="chip"><input type="checkbox" id="ash-day-'+o[0]+'" value="'+o[0]+'" checked>週'+o[1]+'</label>';
+  });
+  h+='<label class="chip"><input type="checkbox" id="ash-day-0" value="0" checked>公眾假期</label>';
+  h+='</div></div>';
+  h+='<button class="btn btn-primary" onclick="addShift()">新增班次</button></div>';
+  h+=renderHolidayCard();
+  return h;
+}
+
+function saveShift(id){
+  const s=db.shifts.find(x=>x.id===id); if(!s) return;
+  s.name=document.getElementById('sh-name-'+id).value.trim()||s.name;
+  s.start=document.getElementById('sh-start-'+id).value||s.start;
+  s.end=document.getElementById('sh-end-'+id).value||s.end;
+  s.crossDay=document.getElementById('sh-cross-'+id).value==='1';
+  s.break=document.getElementById('sh-break-'+id).value.trim();
+  const qfEl=document.getElementById('sh-qf-'+id); if(qfEl) s.quotaFull=Math.max(0, parseInt(qfEl.value,10)||0);
+  const qpEl=document.getElementById('sh-qp-'+id); if(qpEl) s.quotaPart=Math.max(0, parseInt(qpEl.value,10)||0);
+  const c=document.getElementById('sh-color-'+id); if(c) s.color=c.value;
+  const days=[];
+  ['1','2','3','4','5','6','7','0'].forEach(function(k){
+    const el=document.getElementById('sh-day-'+id+'-'+k);
+    if(el && el.checked) days.push(+k);
+  });
+  s.days=days;
+  saveDB();
+  const removed=enforceQuota();
+  alert('班次「'+s.name+'」已更新，更表配額、空缺判斷與工時計算已即時生效。'+(removed>0?'（已自動移除 '+removed+' 筆超額排班，保留先排者）':''));
+  go('shifts');
+}
+
+function addShift(){
+  const name=document.getElementById('ash-name').value.trim();
+  const start=document.getElementById('ash-start').value;
+  const end=document.getElementById('ash-end').value;
+  if(!name){ alert('請填寫班次名稱。'); return; }
+  if(!start || !end){ alert('請填寫開始與結束時間。'); return; }
+  const qfEl=document.getElementById('ash-qf'); const qf=qfEl?Math.max(0, parseInt(qfEl.value,10)||0):1;
+  const qpEl=document.getElementById('ash-qp'); const qp=qpEl?Math.max(0, parseInt(qpEl.value,10)||0):1;
+  const days=[];
+  ['1','2','3','4','5','6','7','0'].forEach(function(k){
+    const el=document.getElementById('ash-day-'+k);
+    if(el && el.checked) days.push(+k);
+  });
+  db.shifts.push({ id:genId(), name:name, code:name, start:start, end:end, crossDay:document.getElementById('ash-cross').value==='1', break:document.getElementById('ash-break').value.trim(), color:document.getElementById('ash-color').value, isRest:false, quotaFull:qf, quotaPart:qp, days:days });
+  saveDB(); alert('已新增班次「'+name+'」。'); go('shifts');
+}
+
+function deleteShift(id){
+  const s=db.shifts.find(x=>x.id===id); if(!s || s.isRest) return;
+  const used=db.schedules.filter(x=>x.shiftId===id && isWorking(x));
+  if(!confirm('確定要刪除班次「'+s.name+'」嗎？'+(used.length?('目前有 '+used.length+' 筆排班引用此班次，將一併刪除。'):''))) return;
+  db.shifts=db.shifts.filter(x=>x.id!==id);
+  if(used.length) db.schedules=db.schedules.filter(x=>!(x.shiftId===id && isWorking(x)));
+  saveDB(); alert('已刪除班次「'+s.name+'」。'); go('shifts');
+}
+function bindShiftsView(){}
+/* ---------------- 崗位管理 ---------------- */
+function positionsOf(){ return Array.isArray(db.positions)?db.positions:[]; }
+function renderPositionsView(){
+  const u=currentUser();
+  if(u.role==='employee') return '<div class="page-title">🧩 崗位管理</div><div style="color:#d33">此功能僅限老闆 / 經理使用。</div>';
+  let h='<div class="page-title">🧩 崗位管理</div><div class="page-sub">管理排更時可選用的崗位：新增、修改名稱或刪除（被員工或排班引用的崗位無法刪除）。</div>';
+  h+='<div class="card"><div class="card-title">現有崗位</div>';
+  if(!positionsOf().length){ h+='<div style="color:var(--muted)">暫無崗位。</div>'; }
+  positionsOf().forEach(p=>{
+    const refEmp=db.users.filter(x=>x.role==='employee' && x.defaultPosition===p.name).length;
+    const refSch=db.schedules.filter(s=>isWorking(s) && s.position===p.name).length;
+    h+='<div class="form-row" style="flex-wrap:wrap;gap:8px"><label style="min-width:64px">崗位名稱</label><input id="pos-name-'+p.id+'" value="'+esc(p.name)+'" style="max-width:200px">'
+      +'<button class="btn btn-primary" onclick="savePosition(\''+p.id+'\')">儲存</button>'
+      +'<button class="btn btn-danger" onclick="deletePosition(\''+p.id+'\')">刪除</button>'
+      +'<span style="font-size:11px;color:var(--muted);align-self:center">員工 '+refEmp+' 人 · 排班 '+refSch+' 筆</span></div>';
+  });
+  h+='</div>';
+  h+='<div class="card"><div class="card-title">＋ 新增崗位</div>';
+  h+='<div class="form-row"><label>崗位名稱</label><input id="np-name" placeholder="如 侍應"></div>';
+  h+='<button class="btn btn-primary" onclick="addPosition()">新增崗位</button></div>';
+  return h;
+}
+function savePosition(id){
+  const p=(db.positions||[]).find(x=>x.id===id); if(!p) return;
+  const el=document.getElementById('pos-name-'+id);
+  const nm=el.value.trim(); if(!nm){ alert('崗位名稱不能為空。'); return; }
+  if(nm!==p.name && (db.positions||[]).some(x=>x.name===nm)){ alert('已存在同名崗位。'); return; }
+  p.name=nm; saveDB(); alert('崗位已改名為「'+nm+'」。'); go('positions');
+}
+function addPosition(){
+  const nm=document.getElementById('np-name').value.trim();
+  if(!nm){ alert('請填寫崗位名稱。'); return; }
+  if((db.positions||[]).some(x=>x.name===nm)){ alert('已存在同名崗位。'); return; }
+  db.positions.push({ id:genId(), name:nm }); saveDB(); alert('已新增崗位「'+nm+'」。'); go('positions');
+}
+function deletePosition(id){
+  const p=(db.positions||[]).find(x=>x.id===id); if(!p) return;
+  const refEmp=db.users.filter(x=>x.role==='employee' && x.defaultPosition===p.name).length;
+  const refSch=db.schedules.filter(s=>isWorking(s) && s.position===p.name).length;
+  if(refEmp||refSch){ alert('無法刪除崗位「'+p.name+'」：仍有 '+refEmp+' 名員工、'+refSch+' 筆排班引用此崗位，請先變更引用。'); return; }
+  if(!confirm('確定要刪除崗位「'+p.name+'」嗎？')) return;
+  db.positions=db.positions.filter(x=>x.id!==id); saveDB(); alert('已刪除崗位「'+p.name+'」。'); go('positions');
+}
+/* ---------------- 賬號管理（老闆專屬） ---------------- */
+function renderAccountsView(){
+  return renderStaffView();
+}
+
+/* ---------------- 刪除員工（老闆專屬） ---------------- */
+function deleteEmployee(uid){
+  const u=userById(uid); if(!u || u.role!=='employee') return;
+  if(!confirm('確定要刪除員工「'+u.name+'」嗎？其更表排班與請求記錄將一併移除。')) return;
+  db.users=db.users.filter(x=>x.id!==uid);
+  db.schedules=db.schedules.filter(s=>s.employeeId!==uid);
+  db.requests=db.requests.filter(r=>r.employeeId!==uid);
+  saveDB(); alert('已刪除員工「'+u.name+'」。'); go('staff');
+}
+/* ---------------- 日視圖（一天更表） ---------------- */
+function dayTimeToMin(t){ if(!t) return 0; const p=t.split(':').map(Number); return (p[0]||0)*60+(p[1]||0); }
+function renderDayView(){
+  const u=currentUser(); const bId=userBranchId(); const branch=branchById(bId);
+  if(!state.dayDate) state.dayDate=todayStr();
+  const ds=state.dayDate;
+  const m=schMap(bId);
+  const prevDs=toDateStr(addDays(parseDate(ds),-1));
+  const rows=[];
+  employeesOf(bId).forEach(e=>{
+    if(leaveOn(e.id,ds)){ rows.push({e:e, leave:true}); return; }
+    const segs=[];
+    const sch=m[e.id+'|'+ds];
+    if(sch && isWorking(sch)){
+      const st=shiftById(sch.shiftId);
+      if(st){
+        segs.push({e:e, st:st, fromPrev:false,
+          start:dayTimeToMin(st.start),
+          end:Math.min(dayTimeToMin(st.end)+(st.crossDay?1440:0),1440)});
+      }
+    }
+    const pSch=m[e.id+'|'+prevDs];
+    if(pSch && isWorking(pSch)){
+      const pst=shiftById(pSch.shiftId);
+      if(pst && pst.crossDay){
+        segs.push({e:e, st:pst, fromPrev:true, start:0, end:Math.min(dayTimeToMin(pst.end),1440)});
+      }
+    }
+    if(!segs.length) return;
+    rows.push.apply(rows, segs);
+  });
+  rows.sort((a,b)=>{ const as=a.leave?1440:a.start; const bs=b.leave?1440:b.start; return as-bs; });
+  let h='<div class="page-title">📆 日視圖</div>';
+  h+='<div class="page-sub">'+esc(branch.name)+' · '+fmtFull(parseDate(ds))+'（'+weekdayName(parseDate(ds))+'）· 以 1 小時為單位顯示當日上班員工排班'+(u.role==='employee'?'（🔆 黃色高亮為您的班次）':'')+'</div>';
+  if(u.role==='boss') h+=renderBranchTabs();
+  h+='<div class="toolbar">';
+  h+='<input type="date" id="day-date" value="'+ds+'" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px">';
+  h+='<button class="btn btn-secondary" onclick="dayJump(-1)">‹ 前一天</button>';
+  h+='<button class="btn btn-secondary" onclick="dayJump(0)">今天</button>';
+  h+='<button class="btn btn-secondary" onclick="dayJump(1)">後一天 ›</button>';
+  h+='<span class="spacer"></span><button class="btn btn-secondary btn-sm" onclick="go(\'schedule\')">切換至週視圖</button>';
+  if(u.role==='boss'||u.role==='manager') h+='<button class="btn btn-secondary btn-sm" onclick="exportCSV(\'day\')">⬇ 匯出CSV</button>';
+  h+='</div>';
+  h+='<div class="card"><div class="card-title">顏色圖例</div><div class="legend">';
+  db.shifts.forEach(s=>{ if(!s.isRest) h+='<span class="item"><span class="swatch" style="background:'+s.color+'"></span>'+esc(s.name)+(s.crossDay?'（跨日）':'')+' · '+esc(s.start||'—')+'-'+esc(s.end||'—')+'</span>'; });
+  h+='<span class="item"><span class="swatch day-break-swatch"></span>午膳 / 休息時間</span>';
+  h+='<span class="item"><span class="swatch" style="background:#5C9DFF"></span>全職（(全)）</span><span class="item"><span class="swatch" style="background:#FFA94D"></span>兼職（(兼)）</span>';
+  h+='</div></div>';
+  h+='<div class="card"><div class="card-title">當日排班時間軸（'+ds+'）</div>';
+  h+='<div class="day-grid"><div class="day-ghead">';
+  h+='<div class="day-emp-head">員工</div><div class="day-timeline">';
+  for(let hr=0;hr<24;hr++) h+='<div class="day-h">'+String(hr).padStart(2,'0')+'</div>';
+  h+='</div></div>';
+  if(!rows.length){ h+='<div style="color:var(--muted);padding:14px 0">當日沒有上班排班。</div>'; }
+  rows.forEach(r=>{
+    const meCls=(r.e && r.e.id===state.userId)?' me-day-row':'';
+    h+='<div class="day-row'+meCls+'"><div class="day-emp">'+empLabel(r.e)+'<small>'+esc(r.e.defaultPosition||'')+'</small></div><div class="day-timeline">';
+    if(r.leave){ h+='<div class="day-note">請假</div>'; }
+    else{
+      const start=r.start;
+      const end=r.end;
+      const total=Math.max(end-start,1);
+      const leftPct=(start/1440*100);
+      const widthPct=(total/1440*100);
+      const endHm=pad(Math.floor(end/60))+':'+pad(end%60);
+      const titleTxt=r.fromPrev?(esc(r.st.name)+'（跨日班次，自昨日 '+esc(r.st.start)+' 開始，今日 '+endHm+' 結束）'):(esc(r.st.name)+' '+esc(r.st.start)+'-'+esc(r.st.end)+(r.st.crossDay?'（跨日）':''));
+      const labelTxt=r.fromPrev?(esc(r.st.name)+' 00:00-'+esc(r.st.end)+'（跨日）'):(esc(r.st.name)+' '+esc(r.st.start)+'-'+(r.st.crossDay?'24:00（跨日）':esc(r.st.end)));
+      h+='<div class="day-bar" style="left:'+leftPct.toFixed(2)+'%;width:'+widthPct.toFixed(2)+'%;background:'+r.st.color+'" title="'+titleTxt+'">';
+      h+='<span class="day-bar-label">'+labelTxt+'</span>';
+      if(r.st.break && r.st.break.includes('-')){
+        const bp=r.st.break.split('-');
+        const bs=dayTimeToMin(bp[0]); const be=dayTimeToMin(bp[1]);
+        const bsC=Math.max(bs,start); const beC=Math.min(be,end);
+        if(beC>bsC){
+          const bl=((bsC-start)/total*100); const bw=((beC-bsC)/total*100);
+          h+='<div class="day-break" style="left:'+bl.toFixed(2)+'%;width:'+bw.toFixed(2)+'%"></div>';
+        }
+      }
+      h+='</div>';
+    }
+    h+='</div></div>';
+  });
+  h+='</div></div>';
+  return h;
+}
+function dayJump(dir){
+  if(dir===0){ state.dayDate=todayStr(); }
+  else if(state.dayDate){ state.dayDate=toDateStr(addDays(parseDate(state.dayDate), dir)); }
+  else { state.dayDate=todayStr(); }
+  go('day');
+}
+function bindDayView(){
+  const el=document.getElementById('day-date');
+  if(el) el.addEventListener('change', ()=>{ state.dayDate=el.value; go('day'); });
+}
+function renderStaffView(){
+  const u=currentUser();
+  const isBoss=u.role==='boss';
+  const branches=isBoss?db.branches:db.branches.filter(b=>b.id===u.branchId);
+  let h='<div class="page-title">👥 員工管理</div><div class="page-sub">編輯員工姓名 / 帳號 / 分店 / 角色 / 崗位 / 分類；全職員工可設定每週工時與日數上限（排更 / 統計會提示超標）。'+(isBoss?'老闆可查看並修改所有帳號密碼，並可刪除員工。':'不會顯示密碼。')+'</div>';
+  branches.forEach(b=>{
+    const emps=db.users.filter(x=>x.branchId===b.id && x.role!=='boss');
+    h+='<div class="card"><div class="card-title">'+esc(b.name)+'（'+emps.length+' 人）</div><table class="data-table"><thead><tr><th>姓名</th><th>帳號</th><th>分店</th><th>角色</th><th>崗位</th><th>分類</th><th>每週工時上限</th><th>每週日數上限</th>'+(isBoss?'<th>密碼（僅老闆可見）</th>':'')+'<th>操作</th></tr></thead><tbody>';
+    emps.forEach(e=>{
+      if(e.role==='manager' && !isBoss){
+        h+='<tr><td>'+esc(e.name)+'</td><td>'+esc(e.username)+'</td><td>'+esc(b.name)+'</td><td>經理</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>';
+        return;
+      }
+      const branchOpts=db.branches.map(x=>'<option value="'+x.id+'"'+(x.id===e.branchId?' selected':'')+'>'+esc(x.name)+'</option>').join('');
+      const roleOpts='<option value="employee"'+(e.role!=='manager'?' selected':'')+'>分店員工</option><option value="manager"'+(e.role==='manager'?' selected':'')+'>分店經理</option>';
+      const posOpts='<option value="">—</option>'+positionsOf().map(p=>'<option value="'+esc(p.name)+'"'+(e.defaultPosition===p.name?' selected':'')+'>'+esc(p.name)+'</option>').join('');
+      const isPt=e.empType==='parttime';
+      h+='<tr>'
+        +'<td><input id="sf-name-'+e.id+'" value="'+esc(e.name)+'" style="width:92px"></td>'
+        +'<td><input id="sf-user-'+e.id+'" value="'+esc(e.username)+'" style="width:76px"></td>'
+        +'<td><select id="sf-branch-'+e.id+'" style="max-width:110px">'+branchOpts+'</select></td>'
+        +'<td><select id="sf-role-'+e.id+'">'+roleOpts+'</select></td>'
+        +'<td><select id="sf-pos-'+e.id+'">'+posOpts+'</select></td>'
+        +'<td><select id="sf-type-'+e.id+'" onchange="toggleFTLimit(\''+e.id+'\')"><option value="fulltime"'+(e.empType!=='parttime'?' selected':'')+'>全職</option><option value="parttime"'+(e.empType==='parttime'?' selected':'')+'>兼職</option></select></td>'
+        +'<td>'+(isPt?'<span style="color:var(--muted)">—</span>':'<input id="sf-hmax-'+e.id+'" type="number" min="0" step="1" value="'+(e.ftHoursMax!=null?e.ftHoursMax:40)+'" style="width:62px">')+'</td>'
+        +'<td>'+(isPt?'<span style="color:var(--muted)">—</span>':'<input id="sf-dmax-'+e.id+'" type="number" min="0" step="1" value="'+(e.ftDaysMax!=null?e.ftDaysMax:5)+'" style="width:62px">')+'</td>'
+        +(isBoss?'<td><input id="sf-pass-'+e.id+'" type="text" value="'+esc(e.password)+'" style="width:86px"></td>':'')
+        +'<td><button class="btn btn-primary btn-sm" onclick="saveStaffRow(\''+e.id+'\')">儲存</button>'
+        +(isBoss?' <button class="btn btn-danger btn-sm" onclick="deleteEmployee(\''+e.id+'\')">刪除</button>':'')+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+  });
+  h+='<div class="card"><div class="card-title">＋ 新增員工</div>';
+  h+='<div class="form-row"><label>姓名</label><input id="ns-name"></div>';
+  h+='<div class="form-row"><label>帳號</label><input id="ns-username"></div>';
+  if(isBoss) h+='<div class="form-row"><label>密碼（僅老闆可見）</label><input id="ns-pass" value="123456"></div>';
+  h+='<div class="form-row"><label>分店</label><select id="ns-branch">';
+  db.branches.forEach(b=>{ h+='<option value="'+b.id+'"'+(b.id===u.branchId?' selected':'')+'>'+esc(b.name)+'</option>'; });
+  h+='</select></div>';
+  h+='<div class="form-row"><label>角色</label><select id="ns-role"><option value="employee">分店員工</option>'+(isBoss?'<option value="manager">分店經理</option>':'')+'</select></div>';
+  h+='<div class="form-row"><label>分類</label><select id="ns-type"><option value="fulltime">全職</option><option value="parttime">兼職</option></select></div>';
+  h+='<div class="form-row"><label>每週工時上限（全職）</label><input type="number" min="0" id="ns-hmax" value="40"></div>';
+  h+='<div class="form-row"><label>每週日數上限（全職）</label><input type="number" min="0" id="ns-dmax" value="5"></div>';
+  h+='<div class="form-row"><label>崗位</label><select id="ns-pos">'+positionsOf().map(p=>'<option>'+esc(p.name)+'</option>').join('')+'</select></div>';
+  h+='<button class="btn btn-primary" onclick="addStaff()">新增員工</button></div>';
+  return h;
+}
+function addStaff(){
+  const name=document.getElementById('ns-name').value.trim();
+  const username=document.getElementById('ns-username').value.trim();
+  const passEl=document.getElementById('ns-pass');
+  const pass=passEl ? (passEl.value.trim()||'123456') : '123456';
+  const branchId=document.getElementById('ns-branch').value;
+  const role=document.getElementById('ns-role').value;
+  const type=document.getElementById('ns-type').value;
+  const pos=document.getElementById('ns-pos').value;
+  const hmaxEl=document.getElementById('ns-hmax');
+  const dmaxEl=document.getElementById('ns-dmax');
+  if(!name||!username){ alert('請填寫姓名與帳號。'); return; }
+  if(db.users.some(x=>x.username===username)){ alert('帳號已存在。'); return; }
+  db.users.push({ id:genId(), name:name, role:role, branchId:branchId, username:username, password:pass, defaultPosition:(role==='manager'?'經理':pos), empType:type, ftHoursMax:(hmaxEl?Math.max(0,parseInt(hmaxEl.value,10)||0):40), ftDaysMax:(dmaxEl?Math.max(0,parseInt(dmaxEl.value,10)||0):5) });
+  saveDB(); alert('已新增員工：'+name+'（'+(type==='parttime'?'兼職':'全職')+'）。'); go('staff');
+}
+function saveStaffType(uid){
+  const emp=db.users.find(x=>x.id===uid); if(!emp) return;
+  const sel=document.querySelector('.staff-type[data-uid="'+uid+'"]');
+  if(!sel) return;
+  emp.empType=sel.value;
+  saveDB(); alert('已更新 '+emp.name+' 的分類為'+(emp.empType==='parttime'?'兼職':'全職')+'。'); go('staff');
+}
+function bindStaffView(){}
+function openHistoryModal(id){
+  const r=db.requests.find(x=>x.id===id); if(!r) return;
+  const hist=(r.history && r.history.length)?r.history:[{status:r.status, at:r.processedAt, by:r.processedBy, reason:r.rejectReason}];
+  let rows='';
+  if(!hist.length) rows='<tr><td colspan="4">尚無處理記錄</td></tr>';
+  hist.forEach(h=>{
+    const stName={pending:'待處理',approved:'已批准',rejected:'已拒絕',edited:'已編輯'}[h.status]||h.status||'—';
+    rows+='<tr><td>'+stName+'</td><td>'+fmtDateTime(h.at)+'</td><td>'+esc(h.by||'—')+'</td><td>'+esc(h.reason||'—')+'</td></tr>';
+  });
+  const body=document.getElementById('modal-body');
+  body.innerHTML='<h3>請求處理記錄</h3><div style="margin-bottom:8px">'+esc(r.type)+' · '+esc(r.dateFrom)+' 至 '+esc(r.dateTo)+'</div>'
+    +(r.editedAt?'<div style="margin-bottom:8px;font-size:12px;color:var(--muted)">最後編輯：'+fmtDateTime(r.editedAt)+'</div>':'')
+    +'<table class="data-table"><thead><tr><th>狀態</th><th>時間</th><th>處理人</th><th>原因</th></tr></thead><tbody>'+rows+'</tbody></table><div class="m-actions"><button class="btn btn-secondary" onclick="closeModal()">關閉</button></div>';
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+}
+function openEditRequestModal(id){
+  const r=db.requests.find(x=>x.id===id); if(!r) return;
+  const opts=['pending','approved','rejected'].map(s=>'<option value="'+s+'"'+(s===r.status?' selected':'')+'>'+(s==='pending'?'待處理':s==='approved'?'已批准':'已拒絕')+'</option>').join('');
+  const body=document.getElementById('modal-body');
+  body.innerHTML='<h3>編輯請求狀態</h3><div class="form-row"><label>新狀態</label><select id="er-status">'+opts+'</select></div><div class="form-row"><label>拒絕原因（若改為拒絕，必填）</label><input id="er-reason" value="'+esc(r.rejectReason||'')+'" placeholder="填寫拒絕原因"></div><div class="m-actions"><button class="btn btn-secondary" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveEditRequest(\''+r.id+'\')">儲存</button></div>';
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+}
+function saveEditRequest(id){
+  const r=db.requests.find(x=>x.id===id); if(!r) return;
+  const status=document.getElementById('er-status').value;
+  const reason=document.getElementById('er-reason').value.trim();
+  if(status==='rejected' && !reason){ alert('拒絕原因不能為空。'); return; }
+  const u=currentUser();
+  r.status=status;
+  r.processedAt=new Date().toISOString();
+  r.processedBy=u.name;
+  if(status==='rejected') r.rejectReason=reason; else if(status==='approved') r.rejectReason='';
+  r.history.push({status:status, at:r.processedAt, by:u.name, reason:reason});
+  saveDB(); closeModal(); go('requests');
+}
+
+/* ---------------- 快速表單新增 ---------------- */
+function quickAdd(){
+  const u=currentUser();
+  const eid=document.getElementById('f-emp').value;
+  const ds=document.getElementById('f-date').value;
+  const shiftId=document.getElementById('f-shift').value;
+  const loc=document.getElementById('f-loc').value;
+  const pos=document.getElementById('f-pos').value;
+  if(!ds){ alert('請選擇日期。'); return; }
+  if(setSchedule(eid, ds, shiftId, loc, pos)===false) return;
+  alert('已新增更表。');
+  go('schedule');
+}
+
+/* ---------------- 初始化 ---------------- */
+document.getElementById('login-role').addEventListener('change', fillLoginBranch);
+document.getElementById('login-pass').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+loadDB();
+// 恢復登入狀態
+const savedUid = (()=>{ try{ return JSON.parse(localStorage.getItem('hk_roster_uid')||'null'); }catch(e){ return null; } })();
+if(savedUid && userById(savedUid)){ loginAs(savedUid); } else { showLogin(); }
+function loginAs(uid){
+  // 覆寫：登入時記住 uid
+  localStorage.setItem('hk_roster_uid', JSON.stringify(uid));
+  const u=userById(uid); if(!u) return;
+  state.userId=uid;
+  state.weekStart=getMonday(new Date());
+  const d=new Date(); state.monthY=d.getFullYear(); state.monthM=d.getMonth();
+  state.bossBranchId = u.role==='boss' ? db.branches[0].id : u.branchId;
+  renderHeader();
+  gotoHome();
+}
+
+/* ================= 本輪新增：周份導航 / 員工管理保存 / 請求附件 ================= */
+function weekNavHTML(jumpFn){
+  return '<div class="toolbar">'
+    +'<button class="btn btn-secondary" onclick="'+jumpFn+'(-1)">‹ 上一週</button>'
+    +'<button class="btn btn-secondary" onclick="'+jumpFn+'(0)">本週</button>'
+    +'<button class="btn btn-secondary" onclick="'+jumpFn+'(1)">下一週 ›</button>'
+    +'<span class="spacer"></span><span style="font-size:13px;color:var(--muted)">顯示週：'+weekRangeLabel()+'</span>'
+    +'</div>';
+}
+function dashWeekJump(dir){
+  if(dir===0) state.weekStart=getMonday(new Date());
+  else state.weekStart=addDays(state.weekStart, dir*7);
+  go('dashboard');
+}
+function statsWeekJump(dir){
+  if(dir===0) state.weekStart=getMonday(new Date());
+  else state.weekStart=addDays(state.weekStart, dir*7);
+  go('stats');
+}
+function saveStaffRow(uid){
+  const a=db.users.find(x=>x.id===uid); if(!a || a.role==='boss') return;
+  const nameEl=document.getElementById('sf-name-'+uid);
+  const userEl=document.getElementById('sf-user-'+uid);
+  if(!nameEl || !userEl){ alert('找不到該員工編輯欄位。'); return; }
+  const name=nameEl.value.trim();
+  const username=userEl.value.trim();
+  if(!name||!username){ alert('姓名與帳號不能為空。'); return; }
+  if(db.users.some(x=>x.username===username && x.id!==uid)){ alert('該帳號已被其他員工使用。'); return; }
+  a.name=name; a.username=username;
+  const newRole=document.getElementById('sf-role-'+uid).value;
+  if(newRole!==a.role){
+    a.role=newRole;
+    if(newRole==='manager'){ a.defaultPosition='經理'; }
+    else if(a.defaultPosition==='經理'){ a.defaultPosition=''; }
+  }
+  a.branchId=document.getElementById('sf-branch-'+uid).value;
+  if(a.role==='employee'){
+    const posEl=document.getElementById('sf-pos-'+uid);
+    if(posEl) a.defaultPosition=posEl.value;
+  }
+  a.empType=document.getElementById('sf-type-'+uid).value;
+  const hEl=document.getElementById('sf-hmax-'+uid);
+  if(hEl) a.ftHoursMax=Math.max(0, parseInt(hEl.value,10)||0);
+  const dEl=document.getElementById('sf-dmax-'+uid);
+  if(dEl) a.ftDaysMax=Math.max(0, parseInt(dEl.value,10)||0);
+  const passEl=document.getElementById('sf-pass-'+uid);
+  if(passEl){ const p=passEl.value.trim(); if(p) a.password=p; }
+  saveDB(); alert('已更新員工「'+a.name+'」。'); go('staff');
+}
+function readAttachInput(inputId, cb){
+  const el=document.getElementById(inputId);
+  if(!el || !el.files || !el.files.length){ cb(null); return; }
+  const file=el.files[0];
+  if(file.size>2*1024*1024){ alert('附件不能超過 2MB。'); cb(null); return; }
+  const rd=new FileReader();
+  rd.onload=function(){ cb({name:file.name, type:file.type||'application/octet-stream', data:rd.result}); };
+  rd.onerror=function(){ alert('讀取附件失敗。'); cb(null); };
+  rd.readAsDataURL(file);
+}
+function openEditMyRequestModal(id){
+  const r=db.requests.find(x=>x.id===id); if(!r) return;
+  const u=currentUser();
+  if(!u || r.employeeId!==u.id){ alert('只能編輯自己的請求。'); return; }
+  const typeOpts=['病假','事假','年假'].map(t=>'<option'+(t===r.type?' selected':'')+'>'+t+'</option>').join('');
+  let attHtml='<div class="form-row"><label>新增附件（選填：圖片或 PDF，≤2MB；留空表示不變更）</label><input type="file" id="mr-attach" accept="image/*,.pdf,.doc,.docx"></div>';
+  if(r.attachment && r.attachment.data){
+    const att=r.attachment;
+    attHtml='<div class="form-row"><label>現有附件</label><div style="display:flex;align-items:center;gap:8px">';
+    if(/^image\//.test(att.type||'')) attHtml+='<img src="'+esc(att.data)+'" style="max-height:40px;max-width:80px;border-radius:4px;border:1px solid var(--border)">';
+    else attHtml+='<span style="font-size:12px">📎 '+esc(att.name||'附件')+'</span>';
+    attHtml+='</div></div><div class="form-row"><label>更換 / 移除附件</label><input type="file" id="mr-attach" accept="image/*,.pdf,.doc,.docx"><br><label style="font-size:12px;font-weight:400"><input type="checkbox" id="mr-remove-att" style="width:auto"> 移除附件</label></div>';
+  }
+  const body=document.getElementById('modal-body');
+  body.innerHTML='<h3>編輯請求</h3>'
+    +'<div class="form-row"><label>請假類型</label><select id="mr-type">'+typeOpts+'</select></div>'
+    +'<div class="form-row"><label>開始日期</label><input type="date" id="mr-from" value="'+esc(r.dateFrom)+'"></div>'
+    +'<div class="form-row"><label>結束日期</label><input type="date" id="mr-to" value="'+esc(r.dateTo)+'"></div>'
+    +'<div class="form-row"><label>原因 / 備註</label><textarea id="mr-note" rows="3" style="width:100%">'+esc(r.note||'')+'</textarea></div>'
+    +attHtml
+    +'<div class="m-actions"><button class="btn btn-secondary" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="saveMyRequest(\''+r.id+'\')">儲存</button></div>';
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+}
+function saveMyRequest(id){
+  const r=db.requests.find(x=>x.id===id); if(!r) return;
+  const u=currentUser();
+  const type=document.getElementById('mr-type').value;
+  const from=document.getElementById('mr-from').value;
+  const to=document.getElementById('mr-to').value;
+  const note=document.getElementById('mr-note').value.trim();
+  if(!from||!to){ alert('請選擇日期範圍。'); return; }
+  if(from>to){ alert('結束日期不能早於開始日期。'); return; }
+  const removeAtt=document.getElementById('mr-remove-att')?document.getElementById('mr-remove-att').checked:false;
+  readAttachInput('mr-attach', function(att){
+    if(removeAtt) r.attachment=null;
+    else if(att) r.attachment=att;
+    r.type=type; r.dateFrom=from; r.dateTo=to; r.note=note;
+    r.editedAt=new Date().toISOString();
+    if(!Array.isArray(r.history)) r.history=[];
+    r.history.push({status:'edited', at:r.editedAt, by:u.name, reason:'員工編輯請求'});
+    saveDB(); closeModal(); go('myrequests');
+  });
+}
+
+/* ================= 本輪新增：班次配額 + 兼職偏好 + 空缺認投 ================= */
+function ensureWeekScheduleFor(ns){
+  if(!db.branches || !Array.isArray(db.branches)) return;
+  const weekStart=getMonday(new Date());
+  const has=db.schedules.some(s=>s.employeeId===ns.id && s.date>=toDateStr(weekStart) && s.date<=toDateStr(addDays(weekStart,6)));
+  if(has) return;
+  const locs=Array.isArray(db.locations)?db.locations.filter(l=>l.branchId===ns.branchId):[];
+  const days = ns.empType==='parttime' ? [0,1,2] : [0,1,2,3,4];
+  days.forEach(di=>{
+    const ds=toDateStr(addDays(weekStart,di));
+    autoAssignShift(ns, ds, locs, ns.defaultPosition||'');
+  });
+}
+function seedClaims(){
+  const ws=getMonday(new Date());
+  const nextMon=toDateStr(addDays(ws,7));
+  const locs=db.locations.filter(l=>l.branchId==='b1');
+  db.schedules.push({ id:genId(), branchId:'b1', employeeId:'u_s2', date:nextMon, shiftId:'s_late', location:(locs[0]?locs[0].name:''), position:'樓面' });
+  db.claims.push({ id:genId(), employeeId:'u_s2', branchId:'b1', date:nextMon, shiftId:'s_late', claimedAt:new Date().toISOString(), status:'claimed' });
+}
+function quotaOf(shiftId){
+  const s=shiftById(shiftId);
+  return { full:(s&&s.quotaFull)||0, part:(s&&s.quotaPart)||0 };
+}
+function quotaStatus(bId, ds, shiftId){
+  const schs=db.schedules.filter(x=>x.branchId===bId && x.date===ds && x.shiftId===shiftId && isWorking(x) && !leaveOn(x.employeeId,ds));
+  let full=0, part=0;
+  schs.forEach(x=>{ const u=userById(x.employeeId); if(u && u.empType==='parttime') part++; else full++; });
+  const q=quotaOf(shiftId);
+  const missingFull=Math.max(0,q.full-full);
+  const missingPart=Math.max(0,q.part-part);
+  return { full:full, part:part, qFull:q.full, qPart:q.part, missing:missingFull+missingPart, missingFull:missingFull, missingPart:missingPart };
+}
+function hasWorkOn(eid, ds){
+  return db.schedules.some(x=>x.employeeId===eid && x.date===ds && isWorking(x));
+}
+function hasPref(eid, ds, shiftId){
+  const u=userById(eid); if(!u || !Array.isArray(u.prefs)) return false;
+  const day=(parseDate(ds).getDay()+6)%7+1;
+  return u.prefs.some(p=>p.d===day && p.shiftId===shiftId);
+}
+function weekScheduleCount(eid, ws){
+  let c=0;
+  for(let i=0;i<7;i++){ const ds=toDateStr(addDays(ws,i)); if(hasWorkOn(eid,ds)) c++; }
+  return c;
+}
+function pickPartCandidate(bId, ds, shiftId){
+  const cands=db.users.filter(x=>x.role==='employee' && x.branchId===bId && x.empType==='parttime' && !leaveOn(x.id,ds) && !hasWorkOn(x.id,ds));
+  if(!cands.length) return null;
+  const mm=nowMonth();
+  const scored=cands.map(c=>({
+    c:c,
+    prefHit:hasPref(c.id,ds,shiftId)?1:0,
+    weekCnt:weekScheduleCount(c.id,state.weekStart),
+    mh:monthWorkHours(c.id,mm[0],mm[1])
+  }));
+  scored.sort((a,b)=>(b.prefHit-a.prefHit)||(a.weekCnt-b.weekCnt)||(a.mh-b.mh));
+  return scored[0].c;
+}
+function autoFillWeek(){
+  const u=currentUser(); if(!u || u.role!=='manager'){ alert('此功能僅供分店經理使用。'); return; }
+  const bId=userBranchId();
+  let filled=0;
+  for(let i=0;i<7;i++){
+    const ds=toDateStr(addDays(state.weekStart,i));
+    db.shifts.forEach(sh=>{
+      if(sh.isRest) return;
+      // 每次重查配額，確保兼職永不超額
+      let need=quotaStatus(bId,ds,sh.id).missingPart;
+      while(need>0){
+        const cand=pickPartCandidate(bId,ds,sh.id);
+        if(!cand) break;
+        const locs=locOptions(bId);
+        db.schedules.push({ id:genId(), branchId:bId, employeeId:cand.id, date:ds, shiftId:sh.id, location:(locs[0]||''), position:cand.defaultPosition||'' });
+        db.claims.push({ id:genId(), employeeId:cand.id, branchId:bId, date:ds, shiftId:sh.id, claimedAt:new Date().toISOString(), status:'autofill' });
+        filled++; need--;
+      }
+    });
+  }
+  saveDB();
+  alert('自動填補完成：共填補 '+filled+' 個兼職空缺更份（優先偏好者、公平輪流分配）。');
+  go('schedule');
+}
+function renderQuotaOverview(bId){
+  const days=[...Array(7)].map((_,i)=>addDays(state.weekStart,i));
+  let h='<table class="data-table quota-table"><thead><tr><th>日期</th>';
+  db.shifts.forEach(s=>{ if(!s.isRest) h+='<th>'+esc(s.name)+'</th>'; });
+  h+='</tr></thead><tbody>';
+  days.forEach(d=>{
+    const ds=toDateStr(d);
+    h+='<tr><td>'+weekdayName(d)+'<br><small>'+fmtMD(d)+'</small>'+(isHoliday(ds)?'<br><span style="color:#d33;font-size:10px;font-weight:700">假期</span>':'')+'</td>';
+    db.shifts.forEach(s=>{
+      if(s.isRest) return;
+      if(!shiftAppliesOn(s,ds)){ h+='<td class="quota-na">不適用</td>'; return; }
+      const st=quotaStatus(bId,ds,s.id);
+      const txt='全職 '+st.full+'/'+st.qFull+'<br>兼職 '+st.part+'/'+st.qPart;
+      if(st.missing>0) h+='<td class="quota-miss">'+txt+'<br><span class="tiny">缺 '+st.missing+'</span></td>';
+      else h+='<td class="quota-ok">'+txt+'</td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  return h;
+}
+function renderPrefView(){
+  const u=currentUser();
+  let h='<div class="page-title">🕐 我的每週偏好</div>';
+  if(u.empType!=='parttime'){
+    h+='<div class="page-sub">此功能僅供兼職員工填寫。</div>';
+    h+='<div class="card"><div style="color:var(--muted)">您是全職員工，系統會依排更配額優先安排全職班次；如需調整可聯絡經理。</div></div>';
+    return h;
+  }
+  h+='<div class="page-sub">填寫您每週可上班的日子及更份（可多選）。公司排更會優先安排符合您偏好的更份；如某更份有多人願意上班，會公平輪流分配。</div>';
+  h+='<div class="card"><div class="card-title">每週可上班更份</div>';
+  h+='<table class="data-table pref-table"><thead><tr><th>日子</th>';
+  db.shifts.forEach(s=>{ if(!s.isRest) h+='<th>'+esc(s.name)+'<br><small>'+esc(s.start)+'-'+esc(s.end)+(s.crossDay?'+1':'')+'</small></th>'; });
+  h+='</tr></thead><tbody>';
+  for(let d=1;d<=7;d++){
+    h+='<tr><td>'+WEEKDAYS[d-1]+'</td>';
+    db.shifts.forEach(s=>{
+      if(s.isRest) return;
+      const has=(u.prefs||[]).some(p=>p.d===d && p.shiftId===s.id);
+      h+='<td style="text-align:center"><input type="checkbox" id="pref-'+d+'-'+s.id+'"'+(has?' checked':'')+' style="width:auto"></td>';
+    });
+    h+='</tr>';
+  }
+  h+='</tbody></table>';
+  h+='<div class="m-actions"><button class="btn btn-primary" onclick="savePrefs()">儲存偏好</button></div></div>';
+  return h;
+}
+function savePrefs(){
+  const u=currentUser(); if(!u) return;
+  const prefs=[];
+  for(let d=1;d<=7;d++){
+    db.shifts.forEach(s=>{
+      if(s.isRest) return;
+      const el=document.getElementById('pref-'+d+'-'+s.id);
+      if(el && el.checked) prefs.push({ d:d, shiftId:s.id });
+    });
+  }
+  u.prefs=prefs; saveDB();
+  alert('已儲存每週偏好：共 '+prefs.length+' 項。');
+  go('myprefs');
+}
+function claimCutoffDate(ds){
+  const d=parseDate(ds);
+  return addDays(getMonday(d), -3);
+}
+function claimOpen(ds){
+  const cutoff=claimCutoffDate(ds);
+  const cutoffEnd=new Date(cutoff.getFullYear(),cutoff.getMonth(),cutoff.getDate(),23,59,59,999);
+  const now=new Date();
+  const d=parseDate(ds);
+  const todayStart=new Date(); todayStart.setHours(0,0,0,0);
+  return d>=todayStart && now<=cutoffEnd;
+}
+function claimStatusText(ds){
+  const cutoff=claimCutoffDate(ds);
+  return '截止：'+fmtFull(cutoff)+'（該更份上班週的前一個星期五）';
+}
+function renderVacancyView(){
+  const u=currentUser(); if(!u) return '';
+  const bId = u.role==='boss' ? (state.bossBranchId||db.branches[0].id) : u.branchId;
+  const branch=branchById(bId);
+  if(state.vacancyOffset==null) state.vacancyOffset=0;
+  const off=state.vacancyOffset;
+  const weekStart=getMonday(addDays(new Date(), off*7));
+  const weekEnd=addDays(weekStart,6);
+  let h='<div class="page-title">📋 空缺認投</div><div class="page-sub">'+esc(branch.name)+' · 依週份檢視未達配額的更份，空閑兼職員工可自行認投。僅顯示當日適用的班次（按星期 / 公眾假期設定）；兼職配額已滿或總人數已滿的更份不開放認投並以紅色「滿員」標示。認投截止：上班日所在週的前一個星期五 23:59。</div>';
+  h+='<div class="card"><div class="card-title">🗓 週份選擇</div><div class="form-row" style="align-items:center">';
+  h+='<button class="btn btn-sm'+(off===-1?' btn-primary':'')+'" onclick="setVacancyWeek(-1)">‹ 上週</button>';
+  h+='<button class="btn btn-sm'+(off===0?' btn-primary':'')+'" onclick="setVacancyWeek(0)">本週</button>';
+  h+='<button class="btn btn-sm'+(off===1?' btn-primary':'')+'" onclick="setVacancyWeek(1)">下週</button>';
+  h+='<button class="btn btn-sm'+(off===2?' btn-primary':'')+'" onclick="setVacancyWeek(2)">再下週</button>';
+  h+='<button class="btn btn-sm'+(off===3?' btn-primary':'')+'" onclick="setVacancyWeek(3)">再下下週</button>';
+  h+='<span style="margin-left:10px;color:var(--muted)">顯示範圍：'+fmtFull(weekStart)+' – '+fmtFull(weekEnd)+'</span></div></div>';
+  const rows=[], fullRows=[];
+  for(let i=0;i<7;i++){
+    const ds=toDateStr(addDays(weekStart,i));
+    applicableShifts(ds).forEach(function(s){
+      const st=quotaStatus(bId,ds,s.id);
+      if(st.missing>0) rows.push({ ds:ds, s:s, st:st });
+      else fullRows.push({ ds:ds, s:s, st:st });
+    });
+  }
+  if(rows.length){
+    h+='<div class="card"><div class="card-title">空缺更份（'+rows.length+' 項）</div><table class="data-table"><thead><tr><th>日期</th><th>更份</th><th>時間</th><th>已排 / 配額</th><th>尚欠</th><th>認投截止</th><th>操作</th></tr></thead><tbody>';
+    rows.forEach(r=>{
+      const open=claimOpen(r.ds);
+      const mine=db.claims.some(c=>c.employeeId===u.id && c.date===r.ds && c.shiftId===r.s.id && c.status==='claimed');
+      const busy=hasWorkOn(u.id, r.ds);
+      const ptFull = r.st.part>=r.st.qPart;
+      h+='<tr>'
+        +'<td>'+fmtFull(parseDate(r.ds))+'<br><small>'+weekdayName(parseDate(r.ds))+(isHoliday(r.ds)?'<br><span style="color:#d33;font-weight:700">公眾假期</span>':'')+'</small></td>'
+        +'<td><span class="swatch" style="width:12px;height:12px;border-radius:3px;background:'+r.s.color+';display:inline-block;margin-right:6px"></span>'+esc(r.s.name)+'</td>'
+        +'<td>'+esc(r.s.start)+'-'+esc(r.s.end)+(r.s.crossDay?'（跨日）':'')+'</td>'
+        +'<td>全職 '+r.st.full+'/'+r.st.qFull+' · 兼職 '+r.st.part+'/'+r.st.qPart+'</td>'
+        +'<td style="color:#d33;font-weight:700">'+r.st.missing+' 人</td>'
+        +'<td>'+(open?'<span style="color:#2a2;font-weight:700">開放中</span><br><small>'+claimStatusText(r.ds)+'</small>':'<span style="color:var(--muted)">已截止</span><br><small>'+claimStatusText(r.ds)+'</small>')+'</td>'
+        +'<td>';
+      if(mine){ h+='<span style="color:#2a2;font-weight:700">✓ 您已認投</span>'; }
+      else if(u.empType!=='parttime'){ h+='<span style="color:var(--muted)">僅兼職可認投</span>'; }
+      else if(!open){ h+='<span style="color:var(--muted)">已截止</span>'; }
+      else if(busy){ h+='<span style="color:var(--muted)">當日已有更份</span>'; }
+      else if(ptFull){ h+='<span class="full-tag">滿員</span>'; }
+      else { h+='<button class="btn btn-primary btn-sm" onclick="claimShift(\''+r.ds+'\',\''+r.s.id+'\')">認投</button>'; }
+      h+='</td></tr>';
+    });
+    h+='</tbody></table></div>';
+  } else {
+    h+='<div class="card"><div style="color:var(--muted)">此週份沒有空缺更份。</div></div>';
+  }
+  if(fullRows.length){
+    h+='<div class="card"><div class="card-title">已滿員更份（'+fullRows.length+' 項，不開放認投）</div><div style="font-size:12px;color:var(--muted);margin-bottom:8px">以下更份總人數或兼職配額已滿，僅作展示：</div><table class="data-table"><thead><tr><th>日期</th><th>更份</th><th>時間</th><th>已排 / 配額</th><th>狀態</th></tr></thead><tbody>';
+    fullRows.forEach(r=>{
+      h+='<tr>'
+        +'<td>'+fmtFull(parseDate(r.ds))+'<br><small>'+weekdayName(parseDate(r.ds))+(isHoliday(r.ds)?'<br><span style="color:#d33;font-weight:700">公眾假期</span>':'')+'</small></td>'
+        +'<td><span class="swatch" style="width:12px;height:12px;border-radius:3px;background:'+r.s.color+';display:inline-block;margin-right:6px"></span>'+esc(r.s.name)+'</td>'
+        +'<td>'+esc(r.s.start)+'-'+esc(r.s.end)+(r.s.crossDay?'（跨日）':'')+'</td>'
+        +'<td>全職 '+r.st.full+'/'+r.st.qFull+' · 兼職 '+r.st.part+'/'+r.st.qPart+'</td>'
+        +'<td><span class="full-tag">滿員</span></td></tr>';
+    });
+    h+='</tbody></table></div>';
+  }
+  h+='<div class="card"><div class="card-title">分配邏輯說明</div><div style="font-size:12px;color:var(--muted)">① 認投先到先得；② 公司自動排更時會優先安排已填寫「當日當更份偏好」者；③ 若某更份願意上班的兼職多於所需人數，將公平輪流分配（已排工時最少 / 上次未獲者優先），確保人人有機會。</div></div>';
+  return h;
+}
+function claimShift(ds, shiftId){
+  const u=currentUser(); if(!u) return;
+  if(u.empType!=='parttime'){ alert('只有兼職員工可以認投空缺更份。'); return; }
+  if(!claimOpen(ds)){ alert('認投已截止：'+claimStatusText(ds)+'。'); return; }
+  const shift=shiftById(shiftId);
+  if(!shift || !shiftAppliesOn(shift, ds)){ alert('該班次不適用於 '+ds+'（星期 / 公眾假期設定不符），請選擇當日適用的班次。'); return; }
+  const st=quotaStatus(u.branchId, ds, shiftId);
+  if(st.missing<=0 || st.part>=st.qPart){ alert('該更份已滿員或兼職配額已滿（全職 '+st.full+'/'+st.qFull+'、兼職 '+st.part+'/'+st.qPart+'），暫無空缺。'); return; }
+  if(hasWorkOn(u.id, ds)){ alert('您當日已有更份，無法再認投。'); return; }
+  const locs=locOptions(u.branchId);
+  db.schedules.push({ id:genId(), branchId:u.branchId, employeeId:u.id, date:ds, shiftId:shiftId, location:(locs[0]||''), position:u.defaultPosition||'' });
+  db.claims.push({ id:genId(), employeeId:u.id, branchId:u.branchId, date:ds, shiftId:shiftId, claimedAt:new Date().toISOString(), status:'claimed' });
+  saveDB();
+  alert('認投成功：'+ds+' '+shift.name+'（'+shift.start+'-'+shift.end+'）已加入您的更表。');
+  go('vacancy');
+}
+
+/* ================= 本輪新增：班次配額 + 兼職偏好 + 空缺認投 ================= */
+
+function seedClaims(){
+  const ws=getMonday(new Date());
+  const nextMon=toDateStr(addDays(ws,7));
+  const locs=db.locations.filter(l=>l.branchId==='b1');
+  db.schedules.push({ id:genId(), branchId:'b1', employeeId:'u_s2', date:nextMon, shiftId:'s_late', location:(locs[0]?locs[0].name:''), position:'樓面' });
+  db.claims.push({ id:genId(), employeeId:'u_s2', branchId:'b1', date:nextMon, shiftId:'s_late', claimedAt:new Date().toISOString(), status:'claimed' });
+}
+function quotaOf(shiftId){
+  const s=shiftById(shiftId);
+  return { full:(s&&s.quotaFull)||0, part:(s&&s.quotaPart)||0 };
+}
+function quotaStatus(bId, ds, shiftId){
+  const schs=db.schedules.filter(x=>x.branchId===bId && x.date===ds && x.shiftId===shiftId && isWorking(x) && !leaveOn(x.employeeId,ds));
+  let full=0, part=0;
+  schs.forEach(x=>{ const u=userById(x.employeeId); if(u && u.empType==='parttime') part++; else full++; });
+  const q=quotaOf(shiftId);
+  const missingFull=Math.max(0,q.full-full);
+  const missingPart=Math.max(0,q.part-part);
+  return { full:full, part:part, qFull:q.full, qPart:q.part, missing:missingFull+missingPart, missingFull:missingFull, missingPart:missingPart };
+}
+function hasWorkOn(eid, ds){
+  return db.schedules.some(x=>x.employeeId===eid && x.date===ds && isWorking(x));
+}
+function hasPref(eid, ds, shiftId){
+  const u=userById(eid); if(!u || !Array.isArray(u.prefs)) return false;
+  const day=(parseDate(ds).getDay()+6)%7+1;
+  return u.prefs.some(p=>p.d===day && p.shiftId===shiftId);
+}
+function weekScheduleCount(eid, ws){
+  let c=0;
+  for(let i=0;i<7;i++){ const ds=toDateStr(addDays(ws,i)); if(hasWorkOn(eid,ds)) c++; }
+  return c;
+}
+function pickPartCandidate(bId, ds, shiftId){
+  const cands=db.users.filter(x=>x.role==='employee' && x.branchId===bId && x.empType==='parttime' && !leaveOn(x.id,ds) && !hasWorkOn(x.id,ds));
+  if(!cands.length) return null;
+  const mm=nowMonth();
+  const scored=cands.map(c=>({
+    c:c,
+    prefHit:hasPref(c.id,ds,shiftId)?1:0,
+    weekCnt:weekScheduleCount(c.id,state.weekStart),
+    mh:monthWorkHours(c.id,mm[0],mm[1])
+  }));
+  scored.sort((a,b)=>(b.prefHit-a.prefHit)||(a.weekCnt-b.weekCnt)||(a.mh-b.mh));
+  return scored[0].c;
+}
+
+function renderPrefView(){
+  const u=currentUser();
+  let h='<div class="page-title">🕐 我的每週偏好</div>';
+  if(u.empType!=='parttime'){
+    h+='<div class="page-sub">此功能僅供兼職員工填寫。</div>';
+    h+='<div class="card"><div style="color:var(--muted)">您是全職員工，系統會依排更配額優先安排全職班次；如需調整可聯絡經理。</div></div>';
+    return h;
+  }
+  h+='<div class="page-sub">填寫您每週可上班的日子及更份（可多選）。公司排更會優先安排符合您偏好的更份；如某更份有多人願意上班，會公平輪流分配。</div>';
+  h+='<div class="card"><div class="card-title">每週可上班更份</div>';
+  h+='<table class="data-table pref-table"><thead><tr><th>日子</th>';
+  db.shifts.forEach(s=>{ if(!s.isRest) h+='<th>'+esc(s.name)+'<br><small>'+esc(s.start)+'-'+esc(s.end)+(s.crossDay?'+1':'')+'</small></th>'; });
+  h+='</tr></thead><tbody>';
+  for(let d=1;d<=7;d++){
+    h+='<tr><td>'+WEEKDAYS[d-1]+'</td>';
+    db.shifts.forEach(s=>{
+      if(s.isRest) return;
+      const has=(u.prefs||[]).some(p=>p.d===d && p.shiftId===s.id);
+      h+='<td style="text-align:center"><input type="checkbox" id="pref-'+d+'-'+s.id+'"'+(has?' checked':'')+' style="width:auto"></td>';
+    });
+    h+='</tr>';
+  }
+  h+='</tbody></table>';
+  h+='<div class="m-actions"><button class="btn btn-primary" onclick="savePrefs()">儲存偏好</button></div></div>';
+  return h;
+}
+function savePrefs(){
+  const u=currentUser(); if(!u) return;
+  const prefs=[];
+  for(let d=1;d<=7;d++){
+    db.shifts.forEach(s=>{
+      if(s.isRest) return;
+      const el=document.getElementById('pref-'+d+'-'+s.id);
+      if(el && el.checked) prefs.push({ d:d, shiftId:s.id });
+    });
+  }
+  u.prefs=prefs; saveDB();
+  alert('已儲存每週偏好：共 '+prefs.length+' 項。');
+  go('myprefs');
+}
+function claimCutoffDate(ds){
+  const d=parseDate(ds);
+  return addDays(getMonday(d), -3);
+}
+function claimOpen(ds){
+  const cutoff=claimCutoffDate(ds);
+  const cutoffEnd=new Date(cutoff.getFullYear(),cutoff.getMonth(),cutoff.getDate(),23,59,59,999);
+  const now=new Date();
+  const d=parseDate(ds);
+  const todayStart=new Date(); todayStart.setHours(0,0,0,0);
+  return d>=todayStart && now<=cutoffEnd;
+}
+function claimStatusText(ds){
+  const cutoff=claimCutoffDate(ds);
+  return '截止：'+fmtFull(cutoff)+'（該更份上班週的前一個星期五）';
+}
+
+/* ===== v3 定向修復：配額強制 / 偏好總覽 / 空缺週份 ===== */
+function enforceQuota(){
+  if(!Array.isArray(db.schedules)||!Array.isArray(db.shifts)) return 0;
+  if(!Array.isArray(db.quotaCleanup)) db.quotaCleanup=[];
+  if(db.quotaCleanupCount==null) db.quotaCleanupCount=0;
+  const groups={};
+  db.schedules.forEach(s=>{
+    const sh=shiftById(s.shiftId);
+    if(!sh||sh.isRest) return;
+    const key=s.branchId+'|'+s.date+'|'+s.shiftId;
+    (groups[key]=groups[key]||[]).push(s);
+  });
+  let removed=0;
+  const dropOne=function(s){
+    const idx=db.schedules.findIndex(x=>x.id===s.id);
+    if(idx<0) return false;
+    db.schedules.splice(idx,1);
+    db.quotaCleanup.push({ branchId:s.branchId, date:s.date, shiftId:s.shiftId, employeeId:s.employeeId, removedAt:new Date().toISOString() });
+    return true;
+  };
+  Object.keys(groups).forEach(k=>{
+    const arr=groups[k];
+    const sh=shiftById(arr[0].shiftId);
+    const capFull=sh.quotaFull||0, capPart=sh.quotaPart||0;
+    // 兼職超額：保留先排的前 capPart 名兼職，其餘兼職移除
+    const parts=arr.filter(s=>{ const uu=userById(s.employeeId); return uu && uu.empType==='parttime'; });
+    if(parts.length>capPart){
+      const drop=parts.slice(capPart);
+      drop.forEach(s=>{ if(dropOne(s)) removed++; });
+    }
+    // 全職超額：保留先排的前 capFull 名全職，其餘全職移除
+    const fulls=arr.filter(s=>{ const uu=userById(s.employeeId); return !uu || uu.empType!=='parttime'; });
+    if(fulls.length>capFull){
+      const drop=fulls.slice(capFull);
+      drop.forEach(s=>{ if(dropOne(s)) removed++; });
+    }
+  });
+  if(db.quotaCleanup.length>200) db.quotaCleanup=db.quotaCleanup.slice(-200);
+  if(removed>0){ db.quotaCleanupCount=(db.quotaCleanupCount||0)+removed; saveDB(); }
+  return removed;
+}
+function quotaCleanupBanner(){
+  const n=db.quotaCleanupCount||0;
+  if(n<=0) return '';
+  return '<div class="card" style="border:1px solid #e6a23c;background:#fdf6ec"><div class="card-title" style="color:#c77700">⚠ 配額自動修正</div><div style="font-size:12px;color:#8a6d3b">已自動修正 '+n+' 筆超額排班（優先保留先排者），確保每更份已排人數不超過配額總和。調整配額或修改排班時會再次自動檢查。</div></div>';
+}
+function prefDayName(d){ const names=['','一','二','三','四','五','六','日']; return (d>=1&&d<=7)?names[d]:('D'+d); }
+function renderPrefOverview(){
+  const u=currentUser(); if(!u) return '';
+  const isBoss=u.role==='boss';
+  const branches=isBoss?db.branches:db.branches.filter(b=>b.id===u.branchId);
+  let h='<div class="page-title">🕐 兼職偏好總覽</div><div class="page-sub">'+(isBoss?'老闆可查看全部兼職員工的每週偏好。':'僅顯示本分店的兼職員工偏好。')+'</div>';
+  branches.forEach(b=>{
+    const pts=db.users.filter(x=>x.branchId===b.id && x.empType==='parttime' && x.role==='employee');
+    h+='<div class="card"><div class="card-title">'+esc(b.name)+'（兼職 '+pts.length+' 人）</div>';
+    if(!pts.length){ h+='<div style="color:var(--muted)">無兼職員工。</div></div>'; return; }
+    h+='<table class="data-table"><thead><tr><th>員工</th><th>每週偏好（星期：更份）</th><th>偏好數</th></tr></thead><tbody>';
+    pts.forEach(e=>{
+      const p=Array.isArray(e.prefs)?e.prefs:[];
+      let txt;
+      if(!p.length){ txt='<span style="color:var(--muted)">未設定偏好</span>'; }
+      else{
+        txt=p.map(x=>{ const sh=shiftById(x.shiftId); return '週'+prefDayName(x.d)+'：'+(sh?esc(sh.name):esc(x.shiftId)); }).join('<br>');
+      }
+      h+='<tr><td>'+esc(e.name)+'<br><small>'+esc(e.username)+'</small></td><td>'+txt+'</td><td>'+p.length+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+  });
+  if(!branches.length){ h+='<div class="card"><div style="color:var(--muted)">無可查看的分店。</div></div>'; }
+  return h;
+}
+function setVacancyWeek(off){ state.vacancyOffset=off; go('vacancy'); }
+
+function isHoliday(ds){ return Array.isArray(db.holidays) && db.holidays.indexOf(ds)>=0; }
+function shiftAppliesOn(s, ds){
+  if(!s || s.isRest) return true;
+  if(!Array.isArray(s.days) || !s.days.length) return true;
+  const dow=new Date(ds.replace('-','/').replace('-','/')).getDay();
+  const jsDow=(dow+6)%7+1;
+  if(isHoliday(ds)) return s.days.indexOf(0)>=0;
+  return s.days.indexOf(jsDow)>=0;
+}
+function applicableShifts(ds){
+  return db.shifts.filter(function(s){ return !s.isRest && shiftAppliesOn(s, ds); });
+}
+function empLabel(emp){
+  if(!emp) return '';
+  const tag=emp.empType==='parttime'?'（兼）':'（全）';
+  return '<span class="emp-tag" style="color:'+(emp.empType==='parttime'?'#B2600E':'#1A5FA8')+'">'+esc(emp.name)+tag+'</span>';
+}
+function empLabelPlain(emp){
+  if(!emp) return '';
+  return esc(emp.name)+(emp.empType==='parttime'?'（兼）':'（全）');
+}
+function renderEmpLegend(){
+  return '<div class="card"><div class="card-title">員工類型圖例</div><div class="legend">'+
+    '<span class="item"><span class="swatch" style="background:#5C9DFF"></span>全職員工（(全)）</span>'+
+    '<span class="item"><span class="swatch" style="background:#FFA94D"></span>兼職員工（(兼)）</span>'+
+    '<span class="item"><span class="swatch" style="background:#FFE08A"></span>公眾假期日期（該日僅顯示適用公眾假期之班次）</span>'+
+    '</div></div>';
+}
+function weekWorkStats(eid, bId){
+  const ws=toDateStr(state.weekStart); const we=toDateStr(addDays(state.weekStart,6));
+  let hours=0, days=0;
+  db.schedules.forEach(s=>{
+    if(s.employeeId!==eid || (bId && s.branchId!==bId) || !isWorking(s) || leaveOn(s.employeeId,s.date)) return;
+    if(s.date<ws || s.date>we) return;
+    const st=shiftById(s.shiftId); if(!st) return;
+    hours+=hoursBetween(st.start,st.end,st.crossDay,st.break);
+    days++;
+  });
+  return { hours: Math.round(hours*10)/10, days: days };
+}
+function fulltimeLimitAlert(eid, ds, shiftId){
+  const u=db.users.find(x=>x.id===eid); if(!u || u.empType!=='fulltime') return false;
+  const st=shiftById(shiftId); if(!st || st.isRest) return false;
+  const add=hoursBetween(st.start,st.end,st.crossDay,st.break);
+  const hMax=u.ftHoursMax!=null?u.ftHoursMax:40;
+  const dMax=u.ftDaysMax!=null?u.ftDaysMax:5;
+  let baseH=0, baseD=0;
+  db.schedules.forEach(s=>{
+    if(s.employeeId!==eid || !isWorking(s) || leaveOn(s.employeeId,s.date)) return;
+    if(ds && s.date===ds) return;
+    const p=s.date.split('-');
+    const sy=parseInt(p[0],10); const sm=parseInt(p[1],10)-1; const sd=parseInt(p[2],10);
+    const ws=state.weekStart;
+    const t=new Date(sy,sm,sd);
+    const w0=new Date(ws.getFullYear(), ws.getMonth(), ws.getDate());
+    const a=w0.getTime(), b=t.getTime();
+    if(a<=b && b<a+7*86400000){
+      const st2=shiftById(s.shiftId); if(!st2) return;
+      baseH+=hoursBetween(st2.start,st2.end,st2.crossDay,st2.break);
+      baseD++;
+    }
+  });
+  const totalH=Math.round((baseH+add)*10)/10;
+  const totalD=baseD+1;
+  if(totalH>hMax || totalD>dMax){
+    alert('警告：全職員工「'+u.name+'」本週已排 '+baseH+' 小時 / '+baseD+' 日，加上本次新增 '+add+' 小時共 '+totalH+' 小時 / '+totalD+' 日，超過設定上限（每週 '+hMax+' 小時 / '+dMax+' 日）！請留意排班安排。');
+    return true;
+  }
+  return false;
+}
+function buildCSV(kind, bId){
+  const header=['日期','分店','員工','員工類型','班次','開始','結束','跨日','休息時間','地點','崗位'];
+  const rows=[];
+  function escCSV(v){ const s=String(v==null?'':v); return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
+  function pushDay(ds, bid){
+    const m=schMap(bid);
+    employeesOf(bid).forEach(e=>{
+      const sch=m[e.id+'|'+ds];
+      const st=sch && isWorking(sch) ? shiftById(sch.shiftId) : null;
+      if(st){
+        rows.push([ds, branchById(bid).name, e.name, e.empType==='parttime'?'兼職':'全職', st.name, st.start, st.end, st.crossDay?'是':'', st.break||'', sch.location||'', sch.position||'']);
+      } else if(leaveOn(e.id,ds)){
+        rows.push([ds, branchById(bid).name, e.name, e.empType==='parttime'?'兼職':'全職', '請假', '', '', '', '', '', '']);
+      } else if(sch && sch.shiftId==='s_rest'){
+        rows.push([ds, branchById(bid).name, e.name, e.empType==='parttime'?'兼職':'全職', '休息', '', '', '', '', '', '']);
+      }
+    });
+  }
+  if(kind==='week'){
+    const ws=toDateStr(state.weekStart);
+    for(let i=0;i<7;i++) pushDay(toDateStr(addDays(parseDate(ws),i)), bId);
+  } else if(kind==='day'){
+    pushDay(state.dayDate || todayStr(), bId);
+  } else if(kind==='month'){
+    const dim=new Date(state.monthY, state.monthM+1, 0).getDate();
+    for(let d=1; d<=dim; d++) pushDay(toDateStr(new Date(state.monthY, state.monthM, d)), bId);
+  }
+  const lines=[header.map(escCSV).join(',')];
+  rows.forEach(r=> lines.push(r.map(escCSV).join(',')));
+  return lines.join('\r\n');
+}
+function exportCSV(kind){
+  const u=currentUser();
+  const bId = u.role==='boss' ? (state.bossBranchId || db.branches[0].id) : u.branchId;
+  const branch=branchById(bId);
+  const csv=buildCSV(kind, bId);
+  const blob=new Blob(["\ufeff"+csv], {type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  const datePart = kind==='week' ? toDateStr(state.weekStart) : (kind==='day' ? (state.dayDate||todayStr()) : (state.monthY+'-'+String(state.monthM+1).padStart(2,'0')));
+  a.download = '更表_'+branch.name+'_'+kind+'_'+datePart+'.csv';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 300);
+  alert('已匯出「'+branch.name+'」'+(kind==='week'?'週更表':kind==='day'?'日視圖':'月視圖')+' CSV。');
+}
+function addHoliday(){
+  const v=document.getElementById('holiday-date').value;
+  if(!v){ alert('請先選擇日期。'); return; }
+  if(!Array.isArray(db.holidays)) db.holidays=[];
+  if(db.holidays.indexOf(v)>=0){ alert('該日期已是公眾假期。'); return; }
+  db.holidays.push(v); db.holidays.sort();
+  saveDB(); go('shifts');
+}
+function removeHoliday(ds){
+  db.holidays = db.holidays.filter(function(x){ return x!==ds; });
+  saveDB(); go('shifts');
+}
+function renderHolidayCard(){
+  let h='<div class="card"><div class="card-title">🗓 公眾假期日期維護</div><div class="page-sub">公眾假期當天僅顯示「適用星期」勾選了「公眾假期」的班次（預設示範假期：2026-10-01 國慶、2026-10-02、2026-12-25 聖誕、2027-01-01 元旦）。</div>';
+  h+='<div class="form-row"><label>新增假期</label><input type="date" id="holiday-date"><button class="btn btn-primary btn-sm" onclick="addHoliday()" style="margin-left:8px">新增</button></div>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">';
+  if(Array.isArray(db.holidays) && db.holidays.length){
+    db.holidays.forEach(function(ds){
+      h+='<span class="holiday-chip">'+ds+' <button class="btn btn-danger btn-sm" onclick="removeHoliday(\''+ds+'\')" style="margin-left:4px">✕</button></span>';
+    });
+  } else h+='<span style="color:var(--muted)">尚無假期資料。</span>';
+  h+='</div></div>';
+  return h;
+}
+function toggleFTLimit(uid){
+  const el=document.getElementById('sf-type-'+uid); if(!el) return;
+  const isPt=el.value==='parttime';
+  const hEl=document.getElementById('sf-hmax-'+uid); const dEl=document.getElementById('sf-dmax-'+uid);
+  if(isPt){ if(hEl) hEl.parentNode.innerHTML='<span style="color:var(--muted)">—</span>'; if(dEl) dEl.parentNode.innerHTML='<span style="color:var(--muted)">—</span>'; }
+}
+
+function autoAssignShift(emp, ds, locs, pos){
+  const shiftOrder=['s_early','s_mid','s_late','s_night'];
+  const emps=db.users.filter(x=>x.role==='employee' && x.branchId===emp.branchId);
+  const off=emps.findIndex(x=>x.id===emp.id);
+  if(off<0) return false;
+  const locArr = Array.isArray(locs) && locs.length ? locs : [''];
+  for(let k=0;k<shiftOrder.length;k++){
+    const shiftId=shiftOrder[(off+k)%shiftOrder.length];
+    const st=shiftById(shiftId);
+    if(!st || !shiftAppliesOn(st,ds)) continue;
+    const qst=quotaStatus(emp.branchId,ds,shiftId);
+    const dimMiss = emp.empType==='parttime' ? qst.missingPart : qst.missingFull;
+    if(dimMiss<=0) continue;
+    db.schedules.push({ id:genId(), branchId:emp.branchId, employeeId:emp.id, date:ds, shiftId:shiftId, location:(locArr[Math.abs(off+k)%locArr.length]||''), position:pos||emp.defaultPosition||'' });
+    return true;
+  }
+  return false;
+}</script>
+</body>
+</html>
